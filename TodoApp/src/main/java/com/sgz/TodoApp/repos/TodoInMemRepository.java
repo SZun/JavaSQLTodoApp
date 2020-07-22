@@ -17,26 +17,22 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Profile("memory")
-public class TodoInMemRepository implements TodoDao {
+public class TodoInMemRepository {
     
     List<Todo> allTodos = new ArrayList<>();
 
-    @Override
     public Todo getOne(int id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
     public List<Todo> findAll() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
     public void deleteById(int id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
     public Todo save(Todo toSave) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
