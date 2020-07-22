@@ -11,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
@@ -43,7 +42,7 @@ import org.springframework.format.annotation.DateTimeFormat;
     private String description;
     
     @DateTimeFormat(pattern="yyyy-MM-dd")
-    @Future(message = "Start Date must be in future")
+    @Past(message = "Start Date must be in past")
     @Column(nullable = false)
     private LocalDate startDate;
     

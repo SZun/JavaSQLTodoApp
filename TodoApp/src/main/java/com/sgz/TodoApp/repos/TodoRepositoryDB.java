@@ -16,6 +16,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Profile("prod")
-public interface TodoRepositoryDB extends TodoDao, JpaRepository<Todo, Integer> {
+public interface TodoRepositoryDB extends JpaRepository<Todo, Integer> {
     
 }
