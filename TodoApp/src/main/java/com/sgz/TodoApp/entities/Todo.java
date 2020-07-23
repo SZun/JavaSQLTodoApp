@@ -64,7 +64,6 @@ public class Todo {
     private LocalDate endDate;
 
     @Column(nullable = false)
-    @NonNull
     private boolean finished;
 
 }
