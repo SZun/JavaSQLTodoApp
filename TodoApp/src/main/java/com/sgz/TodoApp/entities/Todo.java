@@ -47,7 +47,6 @@ import org.springframework.format.annotation.DateTimeFormat;
     
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "Start Date can not be null")
-    @Past(message = "Start Date must be in past")
     @Column(nullable = false)
     @NonNull private LocalDate startDate;
     
