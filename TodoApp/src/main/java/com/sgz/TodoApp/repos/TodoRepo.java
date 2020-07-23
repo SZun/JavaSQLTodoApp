@@ -6,7 +6,6 @@
 package com.sgz.TodoApp.repos;
 
 import com.sgz.TodoApp.entities.Todo;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Repository;
  * @author samg.zun
  */
 @Repository
-@Profile("prod")
-public interface TodoRepositoryDB extends JpaRepository<Todo, Integer> {
+public interface TodoRepo extends JpaRepository<Todo, Integer> {
     
 }
