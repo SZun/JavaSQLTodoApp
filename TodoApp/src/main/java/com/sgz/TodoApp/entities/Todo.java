@@ -5,7 +5,6 @@
  */
 package com.sgz.TodoApp.entities;
 
-import java.lang.reflect.Field;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -64,7 +63,6 @@ public class Todo {
     private LocalDate endDate;
 
     @Column(nullable = false)
-    @NonNull
     private boolean finished;
 
 }

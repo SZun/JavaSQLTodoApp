@@ -61,9 +61,9 @@ public class TodoServiceTest {
     public void setUp() {
         repo.deleteAll();
         jdbc.update("ALTER TABLE Todos auto_increment = 1");
-        repo.save(new Todo("Laundry", LocalDate.now(), false));
-        repo.save(new Todo("Dishes", LocalDate.now(), false));
-        repo.save(new Todo("Clean Up After Dog", LocalDate.now(), false));
+        repo.save(new Todo("Laundry", LocalDate.now()));
+        repo.save(new Todo("Dishes", LocalDate.now()));
+        repo.save(new Todo("Clean Up After Dog", LocalDate.now()));
     }
 
     @AfterEach
@@ -120,7 +120,7 @@ public class TodoServiceTest {
      */
     @Test
     public void testCreateTodo() throws InvalidEntityException {
-        Todo toAdd = new Todo("Cook", LocalDate.now(), false);
+        Todo toAdd = new Todo("Cook", LocalDate.now());
         Todo expected = new Todo(4, "Cook", null, LocalDate.now(), null, false);
         
         Todo fromService = toTest.createTodo(toAdd);
@@ -138,7 +138,7 @@ public class TodoServiceTest {
 
     @Test
     public void testCreateTodoEmptyName() {
-        Todo toAdd = new Todo("", LocalDate.now(), false);
+        Todo toAdd = new Todo("", LocalDate.now());
         try {
             toTest.createTodo(toAdd);
             fail("should hit InvalidEntityException");
@@ -147,7 +147,7 @@ public class TodoServiceTest {
 
     @Test
     public void testCreateTodoBlankName() {
-        Todo toAdd = new Todo("  ", LocalDate.now(), false);
+        Todo toAdd = new Todo("  ", LocalDate.now());
         try {
             toTest.createTodo(toAdd);
             fail("should hit InvalidEntityException");
@@ -156,7 +156,7 @@ public class TodoServiceTest {
 
     @Test
     public void testCreateTodoTooLongName() {
-        Todo toAdd = new Todo(testLongString, LocalDate.now(), false);
+        Todo toAdd = new Todo(testLongString, LocalDate.now());
         try {
             toTest.createTodo(toAdd);
             fail("should hit InvalidEntityException");
@@ -165,7 +165,7 @@ public class TodoServiceTest {
 
     @Test
     public void testCreateTodoTooLongDescription() {
-        Todo toAdd = new Todo("Cook", LocalDate.now(), false);
+        Todo toAdd = new Todo("Cook", LocalDate.now());
         toAdd.setDescription(testLongString);
         try {
             toTest.createTodo(toAdd);
@@ -175,7 +175,7 @@ public class TodoServiceTest {
 
     @Test
     public void testCreateTodoPastStartDate() {
-        Todo toAdd = new Todo("Cook", LocalDate.of(2020,01,01), false);
+        Todo toAdd = new Todo("Cook", LocalDate.of(2020,01,01));
         try {
             toTest.createTodo(toAdd);
             fail("should hit InvalidEntityException");
@@ -184,7 +184,7 @@ public class TodoServiceTest {
 
     @Test
     public void testCreateTodoEndBeforeStartDate() {
-        Todo toAdd = new Todo("Cook", LocalDate.now(), false);
+        Todo toAdd = new Todo("Cook", LocalDate.now());
         toAdd.setEndDate(LocalDate.of(2020,01,01));
         try {
             toTest.createTodo(toAdd);
@@ -194,7 +194,7 @@ public class TodoServiceTest {
 
     @Test
     public void testCreateTodoFutureEndDate() {
-        Todo toAdd = new Todo("Cook", LocalDate.of(9999,01,01), false);
+        Todo toAdd = new Todo("Cook", LocalDate.of(9999,01,01));
         toAdd.setEndDate(LocalDate.of(9999,02,01));
         try {
             toTest.createTodo(toAdd);
