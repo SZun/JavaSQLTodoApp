@@ -49,15 +49,21 @@ public class TodoService {
 
     public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException{
         validate(toEdit);
-        getById(toEdit.getId());
+        checkExists(toEdit.getId());
         
         return repo.save(toEdit);
     }
             
     public void deleteTodo(int id) throws InvalidIdException {
-        getById(id);
+        checkExists(id);
         
         repo.deleteById(id);
+    }
+    
+    private void checkExists(int id) throws InvalidIdException {
+        if(!repo.existsById(id)){
+            throw new InvalidIdException("Invalid Id");
+        }
     }
 
     private void validate(Todo toUpsert) throws InvalidEntityException {
