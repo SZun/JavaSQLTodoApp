@@ -15,7 +15,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,12 +52,12 @@ public class TodoController {
     }
     
     @PostMapping("/todos")
-    public ResponseEntity<Todo> addTodo(@Valid @RequestBody Todo toAdd, BindingResult res) throws InvalidEntityException{
+    public ResponseEntity<Todo> addTodo(@Valid @RequestBody Todo toAdd) throws InvalidEntityException{
         return new ResponseEntity(service.createTodo(toAdd), HttpStatus.CREATED);
     }
     
     @PutMapping("/todos")
-    public ResponseEntity<Todo> updateTodo(@Valid @RequestBody Todo toAdd, BindingResult res) throws InvalidEntityException{
-        return new ResponseEntity(service.createTodo(toAdd), HttpStatus.OK);
+    public ResponseEntity<Todo> updateTodo(@Valid @RequestBody Todo toAdd) throws InvalidEntityException, InvalidIdException{
+        return new ResponseEntity(service.editTodo(toAdd), HttpStatus.OK);
     }
 }
