@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.sgz.TodoApp.exceptions;
+package com.sgz.TodoApp.exceptionhandlers;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,13 +13,11 @@ import lombok.Getter;
  * @author samg.zun
  */
 @AllArgsConstructor
-public class CustomError {
+public class FieldErrorResponse {
     
-    @Getter private String message;
-    @Getter private String name;
-
-    public LocalDateTime getTimestamp() {
-        return LocalDateTime.now();
-    }
-
+    @Getter
+    private String fieldName;
+    
+    @Getter
+    private String message;
 }
