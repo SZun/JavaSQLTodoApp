@@ -9,11 +9,12 @@ import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
-import com.sgz.TodoApp.repos.TodoRepositoryDB;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.sgz.TodoApp.repos.TodoRepo;
+import java.time.LocalDate;
 
 /**
  *
@@ -23,10 +24,10 @@ import org.springframework.stereotype.Service;
 public class TodoService {
 
     @Autowired
-    TodoRepositoryDB dao;
+    TodoRepo repo;
 
     public List<Todo> getAll() throws NoItemsException {
-        List<Todo> allTodos = dao.findAll();
+        List<Todo> allTodos = repo.findAll();
         if (allTodos.isEmpty()) {
             throw new NoItemsException("No Items");
         }
@@ -34,7 +35,7 @@ public class TodoService {
     }
 
     public Todo getById(int id) throws InvalidIdException {
-        Optional<Todo> toGet = dao.findById(id);
+        Optional<Todo> toGet = repo.findById(id);
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
         }
@@ -43,32 +44,42 @@ public class TodoService {
 
     public Todo createTodo(Todo toAdd) throws InvalidEntityException {
         validate(toAdd);
-        return dao.save(toAdd);
+        return repo.save(toAdd);
     }
 
     public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException{
         validate(toEdit);
-        getById(toEdit.getId());
+        checkExists(toEdit.getId());
         
-        return dao.save(toEdit);
+        return repo.save(toEdit);
     }
             
     public void deleteTodo(int id) throws InvalidIdException {
-        getById(id);
+        checkExists(id);
         
-        dao.deleteById(id);
+        repo.deleteById(id);
+    }
+    
+    private void checkExists(int id) throws InvalidIdException {
+        if(!repo.existsById(id)){
+            throw new InvalidIdException("Invalid Id");
+        }
     }
 
     private void validate(Todo toUpsert) throws InvalidEntityException {
         if(toUpsert == null 
-            || toUpsert.getName() == null 
             || toUpsert.getName().trim().length() == 0
             || toUpsert.getName().trim().length() > 50
             || (toUpsert.getDescription() != null
                 && toUpsert.getDescription().length() > 255)
-            || toUpsert.getStartDate() == null
+            || toUpsert.getStartDate().isBefore(LocalDate.now())
             || (toUpsert.getEndDate() != null 
-                && toUpsert.getEndDate().isBefore(toUpsert.getEndDate()))){
+                && toUpsert.getEndDate().isBefore(toUpsert.getStartDate())
+                )
+            || (toUpsert.getEndDate() != null 
+                && toUpsert.getEndDate().isAfter(LocalDate.now())
+                )
+                ){
             throw new InvalidEntityException("Invalid entity");
         }
     }
