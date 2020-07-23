@@ -12,11 +12,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -25,6 +28,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @Entity(name = "stores")
 @Data public class Todo {
     
@@ -35,21 +39,22 @@ import org.springframework.format.annotation.DateTimeFormat;
     @NotBlank(message = "Name can not be blank")
     @Size(max = 50, message = "Name can not be more than 50 characters")
     @Column(nullable = false)
-    private String name;
+    @NonNull private String name;
     
     @Size(max = 255, message = "Description can not be more than 255 characters")
     @Column
     private String description;
     
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "Start Date can not be null")
     @Past(message = "Start Date must be in past")
     @Column(nullable = false)
-    private LocalDate startDate;
+    @NonNull private LocalDate startDate;
     
     @Past(message = "End Date must be in past")
     @Column
     private LocalDate endDate;
     
     @Column(nullable = false)
-    private boolean finished;
+    @NonNull private boolean finished;
 }
