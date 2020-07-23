@@ -42,7 +42,9 @@ public class TodoServiceTest {
     @Autowired
     TodoRepo repo;
 
-    Todo expected = new Todo(1, "Laundry", null, LocalDate.now(), null, false);
+    Todo testTodo = new Todo(1, "Laundry", null, LocalDate.now(), null, false);
+    
+    String testLongString = "C39V2iGLMtU1xN8tctQQVPnr7Y41mgIqCCPKookK7yrKP9xweAp6Oo7NGOBp6wkWIP1cQZvxW2n40ZK0vUUHWxQzhjUCRnUXFx1uSSKXYP37nlsLcMnmaxpnGY7JGmKap7Q4e1mdtVg3aZ829B3IeMCzxTs2Ex5IOrbgu55cwUKh3z7GBFssVQL4mzr1eHqfOv67prPQgcCQCDIRSEZH1tt0h5yxVgVt2prBdgUWBmo6sg6UPS6k1quBYGDoFBIk";
 
     public TodoServiceTest() {
     }
@@ -79,7 +81,7 @@ public class TodoServiceTest {
         List<Todo> fromService = toTest.getAll();
 
         assertEquals(3, fromService.size());
-        assertTrue(fromService.contains(expected));
+        assertTrue(fromService.contains(testTodo));
         assertTrue(fromService.contains(expected2));
         assertTrue(fromService.contains(expected3));
     }
@@ -101,7 +103,7 @@ public class TodoServiceTest {
         
         Todo fromService = toTest.getById(1);
         
-        assertEquals(expected, fromService);
+        assertEquals(testTodo, fromService);
         
     }
 
@@ -118,46 +120,86 @@ public class TodoServiceTest {
      */
     @Test
     public void testCreateTodo() throws InvalidEntityException {
+        Todo toAdd = new Todo("Cook", LocalDate.now(), false);
+        Todo expected = new Todo(4, "Cook", null, LocalDate.now(), null, false);
+        
+        Todo fromService = toTest.createTodo(toAdd);
+        
+        assertEquals(expected, fromService);
     }
 
     @Test
     public void testCreateTodoNullEntity() {
-    }
-
-    @Test
-    public void testCreateTodoNullName() {
-    }
-
-    @Test
-    public void testCreateTodoNullStartDate() {
+        try {
+            toTest.createTodo(null);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testCreateTodoEmptyName() {
+        Todo toAdd = new Todo("", LocalDate.now(), false);
+        try {
+            toTest.createTodo(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testCreateTodoBlankName() {
+        Todo toAdd = new Todo("  ", LocalDate.now(), false);
+        try {
+            toTest.createTodo(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testCreateTodoTooLongName() {
+        Todo toAdd = new Todo(testLongString, LocalDate.now(), false);
+        try {
+            toTest.createTodo(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testCreateTodoTooLongDescription() {
+        Todo toAdd = new Todo("Cook", LocalDate.now(), false);
+        toAdd.setDescription(testLongString);
+        try {
+            toTest.createTodo(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testCreateTodoPastStartDate() {
+        Todo toAdd = new Todo("Cook", LocalDate.of(2020,01,01), false);
+        try {
+            toTest.createTodo(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testCreateTodoEndBeforeStartDate() {
+        Todo toAdd = new Todo("Cook", LocalDate.now(), false);
+        toAdd.setEndDate(LocalDate.of(2020,01,01));
+        try {
+            toTest.createTodo(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testCreateTodoFutureEndDate() {
+        Todo toAdd = new Todo("Cook", LocalDate.of(9999,01,01), false);
+        toAdd.setEndDate(LocalDate.of(9999,02,01));
+        try {
+            toTest.createTodo(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     /**
@@ -165,50 +207,103 @@ public class TodoServiceTest {
      */
     @Test
     public void testEditTodo() throws InvalidIdException, InvalidEntityException {
+        Todo expected = new Todo(1, "Laundry", "Landry Done", LocalDate.now(), LocalDate.now(), true);
+        
+        Todo fromService = toTest.getById(1);
+        assertEquals(testTodo, fromService);
+        
+        fromService = toTest.editTodo(expected);
+        assertEquals(expected, fromService);
+        
+        fromService = toTest.getById(1);
+        assertNotEquals(testTodo, fromService);
+        assertEquals(expected, fromService);
     }
 
     @Test
     public void testEditTodoNullEntity() throws InvalidIdException {
-    }
-
-    @Test
-    public void testEditTodoNullName() throws InvalidIdException {
-    }
-
-    @Test
-    public void testEditTodoNullStartDate() throws InvalidIdException {
+        try {
+            toTest.editTodo(null);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoEmptyName() throws InvalidIdException {
+        Todo editable = new Todo(1, "", null, LocalDate.now(), null, false);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoBlankName() throws InvalidIdException {
+        Todo editable = new Todo(1, "  ", null, LocalDate.now(), null, false);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoTooLongName() throws InvalidIdException {
+        Todo editable = new Todo(1, testLongString, null, LocalDate.now(), null, false);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoTooLongDescription() throws InvalidIdException {
+        Todo editable = new Todo(1, "Banan", null, LocalDate.now(), null, false);
+        editable.setDescription(testLongString);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoPastStartDate() throws InvalidIdException {
+        Todo editable = new Todo(1, "Banan", null, LocalDate.of(2020,01,01), null, false);
+        editable.setDescription(testLongString);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoEndBeforeStartDate() throws InvalidIdException {
+        Todo editable = new Todo(1, "Banan", null, LocalDate.now(), null, false);
+        editable.setEndDate(LocalDate.of(2020,01,01));
+        editable.setDescription(testLongString);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoFutureEndDate() throws InvalidIdException {
+        Todo editable = new Todo(1, "Banan", null, LocalDate.now(), null, false);
+        editable.setEndDate(LocalDate.of(2021,01,01));
+        editable.setDescription(testLongString);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
     }
 
     @Test
     public void testEditTodoInvalidId() throws InvalidEntityException {
+        Todo editable = new Todo(-1, "Banan", null, LocalDate.now(), null, false);
+        try {
+            toTest.editTodo(editable);
+            fail("should hit InvalidIdException");
+        } catch(InvalidIdException ex){}
     }
 
     /**
@@ -217,7 +312,7 @@ public class TodoServiceTest {
     @Test
     public void testDeleteTodo() throws InvalidIdException {
         Todo fromService = toTest.getById(1);
-        assertEquals(expected, fromService);
+        assertEquals(testTodo, fromService);
         
         toTest.deleteTodo(1);
         

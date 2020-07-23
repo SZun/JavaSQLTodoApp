@@ -68,15 +68,13 @@ public class TodoService {
 
     private void validate(Todo toUpsert) throws InvalidEntityException {
         if(toUpsert == null 
-            || toUpsert.getName() == null 
             || toUpsert.getName().trim().length() == 0
             || toUpsert.getName().trim().length() > 50
             || (toUpsert.getDescription() != null
                 && toUpsert.getDescription().length() > 255)
-            || toUpsert.getStartDate() == null
             || toUpsert.getStartDate().isBefore(LocalDate.now())
             || (toUpsert.getEndDate() != null 
-                && toUpsert.getEndDate().isBefore(toUpsert.getEndDate())
+                && toUpsert.getEndDate().isBefore(toUpsert.getStartDate())
                 )
             || (toUpsert.getEndDate() != null 
                 && toUpsert.getEndDate().isAfter(LocalDate.now())
