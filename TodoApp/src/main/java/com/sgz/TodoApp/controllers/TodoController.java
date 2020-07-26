@@ -51,7 +51,8 @@ public class TodoController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Todo> updateTodo(@Valid @RequestBody Todo toAdd) throws InvalidEntityException, InvalidIdException{
+    public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toAdd) throws InvalidEntityException, InvalidIdException{
+        toAdd.setId(id);
         return new ResponseEntity(service.editTodo(toAdd), HttpStatus.OK);
     }
 }
