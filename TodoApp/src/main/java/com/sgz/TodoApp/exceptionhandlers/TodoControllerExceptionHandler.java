@@ -8,8 +8,6 @@ package com.sgz.TodoApp.exceptionhandlers;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +15,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -54,7 +55,7 @@ public class TodoControllerExceptionHandler {
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "InvalidEntityException"),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public final ResponseEntity<CustomError> handleBindingErrors(
             MethodArgumentNotValidException ex,
