@@ -1,8 +1,11 @@
 package com.sgz.TodoApp.services;
 
+import com.sgz.TodoApp.entities.ApplicationRole;
 import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -29,6 +33,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         ApplicationUser u = op.get();
 
-        return new User(username, u.getPassword(), new HashSet<>());
+        Set<GrantedAuthority> userRoles = new HashSet<>();
+
+        for(ApplicationRole r : u.getAuthorities()){
+            userRoles.add(new SimpleGrantedAuthority(r.getRole()));
+        }
+
+        return new User(username, u.getPassword(), userRoles);
     }
 }
