@@ -5,12 +5,13 @@
  */
 package com.sgz.TodoApp.exceptionhandlers;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  *
@@ -25,7 +26,7 @@ public class CustomError {
     
     @Getter 
     @NonNull private String name;
-    
+
     @Getter
     private List<FieldErrorResponse> errors;
 

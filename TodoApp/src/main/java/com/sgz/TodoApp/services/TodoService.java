@@ -5,16 +5,18 @@
  */
 package com.sgz.TodoApp.services;
 
+import com.google.common.base.Strings;
 import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
-import java.util.List;
-import java.util.Optional;
+import com.sgz.TodoApp.repos.TodoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.sgz.TodoApp.repos.TodoRepo;
+
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -68,7 +70,7 @@ public class TodoService {
 
     private void validate(Todo toUpsert) throws InvalidEntityException {
         if(toUpsert == null 
-            || toUpsert.getName().trim().length() == 0
+            || Strings.isNullOrEmpty(toUpsert.getName())
             || toUpsert.getName().trim().length() > 50
             || (toUpsert.getDescription() != null
                 && toUpsert.getDescription().length() > 255)
