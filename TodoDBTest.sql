@@ -12,3 +12,26 @@ CREATE TABLE Todos(
     End_Date DATE NULL,
     Finished BOOLEAN NOT NULL DEFAULT 0
 );
+
+CREATE TABLE Users(
+	Id INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(100) NOT NULL,
+    `Password` VARCHAR(250) NOT NULL,
+    Account_Expired BOOLEAN NOT NULL DEFAULT 0,
+    Account_Locked BOOLEAN NOT NULL DEFAULT 0,
+    Credentials_Expired BOOLEAN NOT NULL DEFAULT 0,
+    Enabled BOOLEAN NOT NULL DEFAULT 1
+);
+
+CREATE TABLE Authorities(
+	Id INT PRIMARY KEY AUTO_INCREMENT,
+	Authority VARCHAR(50) NULL
+);
+
+CREATE TABLE Users_Authroites(
+	UserId INT NOT NULL,
+    AuthorityId INT NOT NULL,
+    PRIMARY KEY(UserId,AuthorityId),
+	FOREIGN KEY(UserId) REFERENCES Users(Id),
+	FOREIGN KEY(AuthorityId) REFERENCES Authorities(Id)
+);

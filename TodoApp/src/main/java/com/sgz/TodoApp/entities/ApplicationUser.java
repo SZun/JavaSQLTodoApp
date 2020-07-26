@@ -1,5 +1,6 @@
 package com.sgz.TodoApp.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 @Entity(name="Users")
 @Data
-//@AllArgsConstructor
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class ApplicationUser implements UserDetails {
 
@@ -22,6 +23,7 @@ public class ApplicationUser implements UserDetails {
     @Id
     private int id;
 
+    @ManyToMany
     private Set<? extends GrantedAuthority> authorities;
 
     @NotBlank(message = "Password can not be blank")
