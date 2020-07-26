@@ -14,11 +14,11 @@ CREATE TABLE Todos(
 	Id INT PRIMARY KEY AUTO_INCREMENT,
     `Name` VARCHAR(50) NOT NULL,
     `Description` VARCHAR(255) NULL,
-    User_Id INT NOT NULL,
+    -- User_Id INT NOT NULL,
     Start_Date DATE NOT NULL,
     End_Date DATE NULL,
-    Finished BOOLEAN NOT NULL DEFAULT 0,
-    FOREIGN KEY(User_Id) REFERENCES Users(Id)
+    Finished BOOLEAN NOT NULL DEFAULT 0 -- ,
+   -- FOREIGN KEY(User_Id) REFERENCES Users(Id)
 );
 
 CREATE TABLE Roles(
