@@ -1,32 +1,52 @@
 package com.sgz.TodoApp.entities;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.Set;
 
+@Entity(name="Users")
+@Data
+//@AllArgsConstructor
+@RequiredArgsConstructor
 public class ApplicationUser implements UserDetails {
 
-    private final Set<? extends GrantedAuthority> authorities;
-    private final String password;
-    private final String username;
-    private final boolean accountExpired;
-    private final boolean accountLocked;
-    private final boolean credentialsExpired;
-    private final boolean enabled;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    private int id;
 
-    @Autowired
-    public ApplicationUser(String username, String password,  Set<? extends GrantedAuthority> authorities, boolean accountExpired, boolean accountLocked, boolean credentialsExpired, boolean enabled) {
-        this.authorities = authorities;
-        this.password = password;
-        this.username = username;
-        this.accountExpired = accountExpired;
-        this.accountLocked = accountLocked;
-        this.credentialsExpired = credentialsExpired;
-        this.enabled = enabled;
-    }
+    private Set<? extends GrantedAuthority> authorities;
+
+    @NotBlank(message = "Password can not be blank")
+    @Size(max = 20, message = "Password can not be more than 20 characters")
+    @Column(nullable = false)
+    @NonNull
+    private final String password;
+
+    @NotBlank(message = "Username can not be blank")
+    @Size(max = 50, message = "Username can not be more than 50 characters")
+    @Column(nullable = false)
+    @NonNull
+    private final String username;
+
+    @Column(nullable = false)
+    private final boolean accountExpired;
+
+    @Column(nullable = false)
+    private final boolean accountLocked;
+
+    @Column(nullable = false)
+    private final boolean credentialsExpired;
+
+    @Column(nullable = false)
+    private final boolean enabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -61,6 +81,10 @@ public class ApplicationUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void setAuthorities(Set<? extends GrantedAuthority> authorities){
+        this.authorities = authorities;
     }
 }
 
