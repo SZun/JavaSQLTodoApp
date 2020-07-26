@@ -4,35 +4,38 @@ CREATE DATABASE TodoDB;
 
 USE TodoDB;
 
+CREATE TABLE Users(
+	Id INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(100) NOT NULL,
+    `Password` VARCHAR(250) NOT NULL
+);
+
 CREATE TABLE Todos(
 	Id INT PRIMARY KEY AUTO_INCREMENT,
     `Name` VARCHAR(50) NOT NULL,
     `Description` VARCHAR(255) NULL,
+    User_Id INT NOT NULL,
     Start_Date DATE NOT NULL,
     End_Date DATE NULL,
-    Finished BOOLEAN NOT NULL DEFAULT 0
+    Finished BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY(User_Id) REFERENCES Users(Id)
 );
 
-CREATE TABLE Users(
-	Id INT PRIMARY KEY AUTO_INCREMENT,
-    Username VARCHAR(100) NOT NULL,
-    `Password` VARCHAR(250) NOT NULL,
-    Account_Expired BOOLEAN NOT NULL DEFAULT 0,
-    Account_Locked BOOLEAN NOT NULL DEFAULT 0,
-    Credentials_Expired BOOLEAN NOT NULL DEFAULT 0,
-    Enabled BOOLEAN NOT NULL DEFAULT 1
-);
-
-CREATE TABLE Authorities(
+CREATE TABLE Roles(
 	Id INT PRIMARY KEY AUTO_INCREMENT,
 	Authority VARCHAR(50) NULL
 );
 
-CREATE TABLE Users_Authroites(
-	UserId INT NOT NULL,
-    AuthorityId INT NOT NULL,
-    PRIMARY KEY(UserId,AuthorityId),
-	FOREIGN KEY(UserId) REFERENCES Users(Id),
-	FOREIGN KEY(AuthorityId) REFERENCES Authorities(Id)
+CREATE TABLE Users_Roles(
+	User_Id INT NOT NULL,
+    Role_Id INT NOT NULL,
+    PRIMARY KEY(User_Id,Role_Id),
+	FOREIGN KEY(User_Id) REFERENCES Users(Id),
+	FOREIGN KEY(Role_Id) REFERENCES Roles(Id)
 );
+
+INSERT INTO Users(Username, `Password`) VALUES('Sam','password');
+INSERT INTO Roles(Authority) VALUES('USER');
+UPDATE Users SET `Password` = '$2a$10$S8nFUMB8YIEioeWyap24/ucX.dC6v9tXCbpHjJVQUkrXlrH1VLaAS' WHERE id = 1;
+INSERT INTO Users_Roles(User_Id,Role_Id) VALUES(1,1);
 

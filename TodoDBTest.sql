@@ -23,15 +23,23 @@ CREATE TABLE Users(
     Enabled BOOLEAN NOT NULL DEFAULT 1
 );
 
-CREATE TABLE Authorities(
+CREATE TABLE Roles(
 	Id INT PRIMARY KEY AUTO_INCREMENT,
 	Authority VARCHAR(50) NULL
 );
 
-CREATE TABLE Users_Authroites(
-	UserId INT NOT NULL,
-    AuthorityId INT NOT NULL,
-    PRIMARY KEY(UserId,AuthorityId),
-	FOREIGN KEY(UserId) REFERENCES Users(Id),
-	FOREIGN KEY(AuthorityId) REFERENCES Authorities(Id)
+CREATE TABLE Users_Roles(
+	User_Id INT NOT NULL,
+    Role_Id INT NOT NULL,
+    PRIMARY KEY(User_Id,Role_Id),
+	FOREIGN KEY(User_Id) REFERENCES Users(Id),
+	FOREIGN KEY(Role_Id) REFERENCES Roles(Id)
+);
+
+CREATE TABLE Users_Todos(
+	User_Id INT NOT NULL,
+    Todo_Id INT NOT NULL,
+    PRIMARY KEY(User_Id,Todo_Id),
+	FOREIGN KEY(User_Id) REFERENCES Users(Id),
+	FOREIGN KEY(Todo_Id) REFERENCES Todos(Id)
 );

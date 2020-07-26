@@ -18,10 +18,10 @@ public class ApplicationUser {
     @Id
     private int id;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "Users_Roles",
-            joinColumns = {@JoinColumn(name = "UserId")},
-            inverseJoinColumns = {@JoinColumn(name = "RolesId")})
+            joinColumns = {@JoinColumn(name = "User_Id")},
+            inverseJoinColumns = {@JoinColumn(name = "Role_Id")})
     private Set<ApplicationRole> authorities;
 
     @NotBlank(message = "Password can not be blank")

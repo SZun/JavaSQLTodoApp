@@ -23,6 +23,6 @@ public class ApplicationRole {
     @NotBlank(message = "Please enter a role")
     @Size(max = 50, message = "Role title cannot be more than 50 characters")
     @NonNull
-    private String role;
+    private String authority;
 
 }
