@@ -7,6 +7,7 @@ package com.sgz.TodoApp.exceptionhandlers;
 
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
+import com.sgz.TodoApp.exceptions.InvalidNameException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ import java.util.List;
  */
 @ControllerAdvice
 @RestController
-public class TodoControllerExceptionHandler {
+public class ExceptionHandlerController {
 
     @ExceptionHandler(InvalidIdException.class)
     public final ResponseEntity<CustomError> handleInvalidIdException(
@@ -53,6 +54,17 @@ public class TodoControllerExceptionHandler {
         final String CUSTOM_ERR_MESSAGE = "Fields entered are invalid";
 
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "InvalidEntityException"),
+                HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(InvalidNameException.class)
+    public final ResponseEntity<CustomError> handleInvalidNameException(
+            InvalidNameException ex,
+            WebRequest req) {
+
+        final String CUSTOM_ERR_MESSAGE = "Name entered is invalid";
+
+        return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "InvalidNameException"),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
 

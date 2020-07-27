@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -25,7 +26,7 @@ public class ApplicationUser {
     private Set<ApplicationRole> authorities;
 
     @NotBlank(message = "Password can not be blank")
-    @Size(max = 20, message = "Password can not be more than 20 characters")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Password must follow rules")
     @Column(nullable = false)
     @NonNull
     private String password;
@@ -35,6 +36,13 @@ public class ApplicationUser {
     @Column(nullable = false)
     @NonNull
     private String username;
+
+    public ApplicationUser(Set<ApplicationRole> authorities, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
+        this.authorities = authorities;
+        this.password = password;
+        this.username = username;
+    }
+
 
 }
 
