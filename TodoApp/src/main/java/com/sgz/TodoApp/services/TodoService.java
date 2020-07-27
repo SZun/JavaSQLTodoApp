@@ -70,7 +70,7 @@ public class TodoService {
 
     private void validate(Todo toUpsert) throws InvalidEntityException {
         if(toUpsert == null 
-            || Strings.isNullOrEmpty(toUpsert.getName())
+            || Strings.isNullOrEmpty(toUpsert.getName().trim())
             || toUpsert.getName().trim().length() > 50
             || (toUpsert.getDescription() != null
                 && toUpsert.getDescription().length() > 255)

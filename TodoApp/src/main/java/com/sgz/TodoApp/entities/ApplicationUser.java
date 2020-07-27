@@ -37,11 +37,10 @@ public class ApplicationUser {
     @NonNull
     private String username;
 
-    public ApplicationUser(ApplicationUser that) {
-        this.id = that.id;
-        this.authorities = that.authorities;
-        this.password = that.password;
-        this.username = that.username;
+    public ApplicationUser(Set<ApplicationRole> authorities, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
+        this.authorities = authorities;
+        this.password = password;
+        this.username = username;
     }
 }
 

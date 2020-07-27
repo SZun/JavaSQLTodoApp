@@ -8,6 +8,7 @@ import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,8 +26,23 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole(ROLE_USER)")
     public ResponseEntity<ApplicationUser> getUserById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(service.getUserById(id));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole(ROLE_USER)")
+    public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
+        toEdit.setId(id);
+        return new ResponseEntity(service.editUser(toEdit), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole(ROLE_USER)")
+    public ResponseEntity<ApplicationUser> deleteUserById(@PathVariable int id) throws InvalidIdException {
+        service.deleteUserById(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 }
