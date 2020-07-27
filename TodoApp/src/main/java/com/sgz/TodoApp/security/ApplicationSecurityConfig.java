@@ -18,8 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKey;
 
-//import static com.sgz.TodoApp.security.ApplicationUserRole.STUDENT;
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)

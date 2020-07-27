@@ -9,6 +9,7 @@ import com.sgz.TodoApp.exceptions.InvalidNameException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -119,6 +120,10 @@ public class UserService {
         ) {
             throw new InvalidEntityException("Invalid Entity");
         }
+    }
+
+    private String getAuthName() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
 }
