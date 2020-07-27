@@ -34,6 +34,14 @@ public class UserController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole(ROLE_USER)")
     public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
+
+        try {
+            ApplicationUser toCheck = service.getUserByName(toEdit.getUsername());
+            if(toCheck.getId() != id){
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
+        } catch(InvalidNameException | InvalidEntityException ex){}
+
         toEdit.setId(id);
         return new ResponseEntity(service.editUser(toEdit), HttpStatus.OK);
     }

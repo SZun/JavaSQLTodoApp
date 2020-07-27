@@ -42,5 +42,7 @@ public class ApplicationUser {
         this.password = password;
         this.username = username;
     }
+
+
 }
 

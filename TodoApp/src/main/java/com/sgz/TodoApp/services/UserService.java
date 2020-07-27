@@ -36,6 +36,18 @@ public class UserService {
         return repo.save(toAdd);
     }
 
+    public ApplicationUser getUserByName(String username) throws InvalidEntityException, InvalidNameException {
+        if (username == null || Strings.isNullOrEmpty(username)) {
+            throw new InvalidEntityException("Name is invalid");
+        }
+
+        Optional<ApplicationUser> toGet = repo.findByUsername(username);
+        if (!toGet.isPresent()) {
+            throw new InvalidNameException("Name not found");
+        }
+        return toGet.get();
+    }
+
     public ApplicationUser editUser(ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
         validate(toEdit);
         checkExists(toEdit.getId());
@@ -60,23 +72,25 @@ public class UserService {
     }
 
     private void checkExistsByUsername(String username) throws InvalidNameException {
-        if(repo.existsByUsername(username)){
+        if (repo.existsByUsername(username)) {
             throw new InvalidNameException("Name already exists");
         }
     }
 
     private void checkExists(int id) throws InvalidIdException {
-        if(!repo.existsById(id)){
+        if (!repo.existsById(id)) {
             throw new InvalidIdException("Invalid Id");
         }
     }
 
     private void validate(ApplicationUser toUpsert) throws InvalidEntityException {
         if (toUpsert == null
-                || Strings.isNullOrEmpty(toUpsert.getUsername().trim())
+                || toUpsert.getUsername().trim().isEmpty()
                 || toUpsert.getUsername().trim().length() > 50
-                || Strings.isNullOrEmpty(toUpsert.getPassword().trim())
-                || toUpsert.getPassword().trim().length() > 20){
+                || toUpsert.getPassword().trim().isEmpty()
+                || toUpsert.getPassword().trim().length() > 20
+                || !toUpsert.getPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
+        ) {
             throw new InvalidEntityException("Invalid Entity");
         }
     }
