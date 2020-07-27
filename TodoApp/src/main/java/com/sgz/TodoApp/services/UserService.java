@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,12 @@ public class UserService {
         if (allUsers.isEmpty()) {
             throw new NoItemsException("No Items");
         }
+
+        allUsers.forEach(u -> {
+            u.setPassword("");
+            u.setAuthorities(new HashSet<>());
+        });
+
         return allUsers;
     }
 
@@ -54,7 +61,12 @@ public class UserService {
         if (!toGet.isPresent()) {
             throw new InvalidNameException("Name not found");
         }
-        return toGet.get();
+
+        ApplicationUser toReturn = toGet.get();
+        toReturn.setPassword("");
+        toReturn.setAuthorities(new HashSet<>());
+
+        return toReturn;
     }
 
     public ApplicationUser editUser(ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
@@ -72,7 +84,12 @@ public class UserService {
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
         }
-        return toGet.get();
+
+        ApplicationUser toReturn = toGet.get();
+        toReturn.setPassword("");
+        toReturn.setAuthorities(new HashSet<>());
+
+        return toReturn;
     }
 
     public void deleteUserById(int id) throws InvalidIdException {
