@@ -7,6 +7,7 @@ import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.InvalidNameException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,6 +50,86 @@ class UserServiceTest {
         jdbc.update("ALTER TABLE Roles auto_increment = 1");
         jdbc.update("INSERT INTO Roles(Authority) VALUES('USER')");
         toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam"));
+        toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam2"));
+        toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam3"));
+    }
+
+    @Test
+    void getAll() throws NoItemsException {
+        ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
+        ApplicationUser expected2 = new ApplicationUser(2,testRoles,"@amBam20", "Sam2");
+        ApplicationUser expected3 = new ApplicationUser(3,testRoles,"@amBam20", "Sam3");
+
+        List<ApplicationUser> fromService = toTest.getAll();
+
+        assertEquals(3, fromService.size());
+        assertEquals(expected.getId(), fromService.get(0).getId());
+        assertEquals(expected.getAuthorities(), fromService.get(0).getAuthorities());
+        assertTrue(passwordEncoder.matches(expected.getPassword(), fromService.get(0).getPassword()));
+        assertEquals(expected.getUsername(), fromService.get(0).getUsername());
+
+        assertEquals(expected2.getId(), fromService.get(1).getId());
+        assertEquals(expected2.getAuthorities(), fromService.get(1).getAuthorities());
+        assertTrue(passwordEncoder.matches(expected2.getPassword(), fromService.get(1).getPassword()));
+        assertEquals(expected2.getUsername(), fromService.get(1).getUsername());
+
+        assertEquals(expected3.getId(), fromService.get(2).getId());
+        assertEquals(expected3.getAuthorities(), fromService.get(2).getAuthorities());
+        assertTrue(passwordEncoder.matches(expected3.getPassword(), fromService.get(2).getPassword()));
+        assertEquals(expected3.getUsername(), fromService.get(2).getUsername());
+    }
+
+    @Test
+    void getAllNoItems() {
+        repo.deleteAll();
+        try {
+            toTest.getAll();
+            fail("should hit NoItemsException");
+        } catch (NoItemsException ex) {}
+    }
+
+    @Test
+    void getUserByName() throws InvalidNameException, InvalidEntityException {
+        ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
+
+        ApplicationUser fromService = toTest.getUserByName("Sam");
+
+        assertEquals(expected.getId(), fromService.getId());
+        assertEquals(expected.getAuthorities(), fromService.getAuthorities());
+        assertTrue(passwordEncoder.matches(expected.getPassword(), fromService.getPassword()));
+        assertEquals(expected.getUsername(), fromService.getUsername());
+    }
+
+    @Test
+    void getUserByNameNullName() throws InvalidNameException {
+        try {
+            toTest.getUserByName(null);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
+    }
+
+    @Test
+    void getUserByNameEmptyName() throws InvalidNameException {
+        try {
+            toTest.getUserByName("");
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
+    }
+
+    @Test
+    void getUserByNameBlankName() throws InvalidNameException {
+        try {
+            toTest.getUserByName("  ");
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
+    }
+
+    @Test
+    void getUserByNameInvalidName() throws InvalidEntityException {
+        try {
+            toTest.getUserByName("Non Existent Name");
+            fail("should hit InvalidNameException");
+        } catch(InvalidNameException ex){}
     }
 
     @Test
@@ -120,8 +202,6 @@ class UserServiceTest {
 
         assertEquals(original.getId(), fromService.getId());
         assertEquals(original.getAuthorities(), fromService.getAuthorities());
-        System.out.println(original.getPassword());
-        System.out.println(fromService.getPassword());
         assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
         assertEquals(original.getUsername(), fromService.getUsername());
 

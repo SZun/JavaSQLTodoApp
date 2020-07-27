@@ -4,6 +4,7 @@ import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.InvalidNameException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -23,6 +25,12 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<ApplicationUser> createUser(@Valid @RequestBody ApplicationUser toAdd) throws InvalidEntityException, InvalidNameException {
         return new ResponseEntity(service.createUser(toAdd), HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole(ROLE_USER)")
+    public ResponseEntity<List<ApplicationUser>> getAllUsers() throws NoItemsException {
+        return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")

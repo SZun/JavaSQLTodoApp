@@ -1,17 +1,18 @@
 package com.sgz.TodoApp.services;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.ApplicationRole;
 import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.InvalidNameException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,8 +37,16 @@ public class UserService {
         return repo.save(toAdd);
     }
 
+    public List<ApplicationUser> getAll() throws NoItemsException {
+        List<ApplicationUser> allUsers = repo.findAll();
+        if (allUsers.isEmpty()) {
+            throw new NoItemsException("No Items");
+        }
+        return allUsers;
+    }
+
     public ApplicationUser getUserByName(String username) throws InvalidEntityException, InvalidNameException {
-        if (username == null || Strings.isNullOrEmpty(username)) {
+        if (username == null || username.trim().isEmpty()) {
             throw new InvalidEntityException("Name is invalid");
         }
 
