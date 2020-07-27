@@ -28,19 +28,19 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole(ROLE_USER)")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<ApplicationUser>> getAllUsers() throws NoItemsException {
         return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole(ROLE_USER)")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<ApplicationUser> getUserById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(service.getUserById(id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole(ROLE_USER)")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
 
         try {

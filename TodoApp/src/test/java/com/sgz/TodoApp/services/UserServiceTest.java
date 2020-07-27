@@ -46,6 +46,7 @@ class UserServiceTest {
     @BeforeEach
     void setUp() throws InvalidEntityException, InvalidNameException {
         repo.deleteAll();
+        jdbc.update("DELETE FROM Roles");
         jdbc.update("ALTER TABLE Users auto_increment = 1");
         jdbc.update("ALTER TABLE Roles auto_increment = 1");
         jdbc.update("INSERT INTO Roles(Authority) VALUES('USER')");
@@ -186,6 +187,24 @@ class UserServiceTest {
     }
 
     @Test
+    void createUserTooLongPassword() throws InvalidNameException {
+        ApplicationUser toAdd = new ApplicationUser(testRoles,testLongString, "Sammy");
+        try {
+            toTest.createUser(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void createUserTooLongName() throws InvalidNameException {
+        ApplicationUser toAdd = new ApplicationUser(testRoles,"@amBam20", testLongString);
+        try {
+            toTest.createUser(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
     void createUserInvalidPassword() throws InvalidNameException {
         ApplicationUser toAdd = new ApplicationUser(testRoles,"password", "Sammy");
         try {
@@ -228,6 +247,24 @@ class UserServiceTest {
     @Test
     void editUserEmptyName() throws InvalidIdException {
         ApplicationUser toEdit = new ApplicationUser(1,testRoles,"@amBam20", "");
+        try {
+            toTest.editUser(toEdit);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void editUserTooLongPassword() throws InvalidIdException {
+        ApplicationUser toEdit = new ApplicationUser(1,testRoles,testLongString, "Sammy");
+        try {
+            toTest.editUser(toEdit);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void editUserTooLongName() throws InvalidIdException {
+        ApplicationUser toEdit = new ApplicationUser(1,testRoles,"@amBam20", testLongString);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
