@@ -34,8 +34,3 @@ CREATE TABLE Users_Roles(
 	FOREIGN KEY(Role_Id) REFERENCES Roles(Id)
 );
 
-INSERT INTO Users(Username, `Password`) VALUES('Sam','password');
-INSERT INTO Roles(Authority) VALUES('USER');
-UPDATE Users SET `Password` = '$2a$10$S8nFUMB8YIEioeWyap24/ucX.dC6v9tXCbpHjJVQUkrXlrH1VLaAS' WHERE id = 1;
-INSERT INTO Users_Roles(User_Id,Role_Id) VALUES(1,1);
-
