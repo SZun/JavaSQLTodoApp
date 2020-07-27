@@ -18,8 +18,10 @@ public class AdminService {
     }
 
     public ApplicationUser updateUserRole(ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
-        validate(toEdit);
+        if(toEdit == null) throw new InvalidEntityException("Invalid entity");
+
         checkExists(toEdit.getId());
+        validate(toEdit, repo.findById(toEdit.getId()).get());
 
         return repo.save(toEdit);
     }
@@ -30,16 +32,13 @@ public class AdminService {
         }
     }
 
-    private void validate(ApplicationUser toUpsert) throws InvalidEntityException {
-        if (toUpsert == null
-                || toUpsert.getUsername() == null
-                || toUpsert.getUsername().trim().isEmpty()
-                || toUpsert.getUsername().trim().length() > 50
-                || toUpsert.getPassword().trim().isEmpty()
-                || toUpsert.getPassword() == null
-                || toUpsert.getPassword().trim().length() > 255
-                || toUpsert.getAuthorities() == null
-                || toUpsert.getAuthorities().isEmpty()
+    private void validate(ApplicationUser toEdit, ApplicationUser original) throws InvalidEntityException {
+        if (original == null
+                || toEdit.getAuthorities() == null
+                || toEdit.getAuthorities().isEmpty()
+                || original.getId() != toEdit.getId()
+                || !original.getUsername().equals(toEdit.getUsername())
+                || !original.getPassword().equals(toEdit.getPassword())
         ) {
             throw new InvalidEntityException("Invalid Entity");
         }

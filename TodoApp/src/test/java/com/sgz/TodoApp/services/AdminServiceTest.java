@@ -5,6 +5,7 @@ import com.sgz.TodoApp.TestAppConfig;
 import com.sgz.TodoApp.entities.ApplicationRole;
 import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
+import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.InvalidNameException;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,9 +17,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.HashSet;
 import java.util.Set;
 
-//import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TestAppConfig.class)
@@ -54,51 +56,84 @@ class AdminServiceTest {
     }
 
     @Test
-    void updateUserRole() {
+    void updateUserRole() throws InvalidIdException, InvalidEntityException {
+        Set<ApplicationRole> newRoles = Sets.newHashSet(new ApplicationRole(1, "USER"), new ApplicationRole(2, "ADMIN"));
+
+        ApplicationUser original = new ApplicationUser(1, testRoles, "@amBam20", "Sam");
+
+        ApplicationUser fromService = userService.getUserById(1);
+
+        assertEquals(original.getId(), fromService.getId());
+        assertEquals(original.getAuthorities(), fromService.getAuthorities());
+        assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
+        assertEquals(original.getUsername(), fromService.getUsername());
+
+        ApplicationUser expected = new ApplicationUser(1, newRoles, fromService.getPassword(), "Sam");
+
+        fromService = toTest.updateUserRole(expected);
+        assertEquals(fromService, expected);
+
+        assertEquals(original.getId(), fromService.getId());
+        assertNotEquals(original.getAuthorities(), fromService.getAuthorities());
+        assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
+        assertEquals(original.getUsername(), fromService.getUsername());
+
+        fromService = userService.getUserById(1);
+        assertEquals(fromService, expected);
     }
 
     @Test
-    void updateUserRoleInvalidId() {
+    void updateUserRoleInvalidId() throws InvalidEntityException {
+        ApplicationUser testUser = new ApplicationUser(-1, testRoles, "@amBam20", "Sam");
+        try {
+            toTest.updateUserRole(testUser);
+            fail("should hit InvalidIdException");
+        } catch (InvalidIdException ex) {}
     }
 
     @Test
-    void updateUserRoleNullUsername() {
+    void updateUserRoleNullUser() throws InvalidIdException {
+        try {
+            toTest.updateUserRole(null);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex) {}
     }
 
     @Test
-    void updateUserRoleNullPassword() {
+    void updateUserRoleEmptyAuthorities() throws InvalidIdException {
+        ApplicationUser testUser = new ApplicationUser(1, new HashSet<>(), "@amBam20", "Sam");
+        try {
+            toTest.updateUserRole(testUser);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex) {}
     }
 
     @Test
-    void updateUserRoleNullAuthorities() {
+    void updateUserRoleNullAuthorities() throws InvalidIdException {
+        ApplicationUser testUser = new ApplicationUser(1, null, "@amBam20", "Sam");
+        try {
+            toTest.updateUserRole(testUser);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex) {}
     }
 
     @Test
-    void updateUserRoleEmptyUsername() {
+    void updateUserRoleNameDiff() throws InvalidIdException {
+        ApplicationUser testUser = new ApplicationUser(1, testRoles, "@amBam20", "Sammy");
+        try {
+            toTest.updateUserRole(testUser);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex) {}
     }
 
     @Test
-    void updateUserRoleEmptyPassword() {
+    void updateUserRolePasswordDiff() throws InvalidIdException {
+        ApplicationUser testUser = new ApplicationUser(1, testRoles, "@amBam22", "Sam");
+        try {
+            toTest.updateUserRole(testUser);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex) {}
     }
 
-    @Test
-    void updateUserRoleEmptyAuthorities() {
-    }
-
-    @Test
-    void updateUserRoleBlankUsername() {
-    }
-
-    @Test
-    void updateUserRoleBlankPassword() {
-    }
-
-    @Test
-    void updateUserRoleTooLongUsername() {
-    }
-
-    @Test
-    void updateUserRoleTooLongPassword() {
-    }
 
 }
