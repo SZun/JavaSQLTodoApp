@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,13 +36,13 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApplicationUser> getUserById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<ApplicationUser> getUserById(Authentication auth, @PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(service.getUserById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
+    public ResponseEntity<ApplicationUser> updateUserById(Authentication auth, @PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
 
         try {
             ApplicationUser toCheck = service.getUserByName(toEdit.getUsername());
@@ -56,7 +57,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole(ROLE_USER)")
-    public ResponseEntity<ApplicationUser> deleteUserById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<ApplicationUser> deleteUserById(Authentication auth, @PathVariable int id) throws InvalidIdException {
         service.deleteUserById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
