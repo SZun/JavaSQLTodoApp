@@ -27,7 +27,7 @@ public class AdminService {
     }
 
     public ApplicationUser updateUserRole(ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
-        if(toEdit == null) throw new InvalidEntityException("Invalid entity");
+        if (toEdit == null) throw new InvalidEntityException("Invalid entity");
 
         checkUserExists(toEdit.getId());
         validateEditRole(toEdit, uRepo.findById(toEdit.getId()).get());
@@ -160,13 +160,15 @@ public class AdminService {
     }
 
     private void validateRole(Role toUpsert) throws InvalidEntityException {
-        if(toUpsert == null || toUpsert.getAuthority().trim().isEmpty() || toUpsert.getAuthority().trim().length() > 50){
+        if (toUpsert == null
+                || toUpsert.getAuthority().trim().isEmpty()
+                || toUpsert.getAuthority().trim().length() > 50) {
             throw new InvalidEntityException("Invalid entity");
         }
     }
 
     private void checkExistsByAuthority(String authority) throws InvalidAuthorityException {
-        if(rRepo.existsByAuthority(authority)){
+        if (rRepo.existsByAuthority(authority)) {
             throw new InvalidAuthorityException("Authority already in use");
         }
     }

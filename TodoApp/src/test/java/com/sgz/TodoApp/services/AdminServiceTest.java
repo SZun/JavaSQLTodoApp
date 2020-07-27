@@ -2,12 +2,10 @@ package com.sgz.TodoApp.services;
 
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.TestAppConfig;
-import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.ApplicationUser;
-import com.sgz.TodoApp.exceptions.InvalidEntityException;
-import com.sgz.TodoApp.exceptions.InvalidIdException;
-import com.sgz.TodoApp.exceptions.InvalidNameException;
-import com.sgz.TodoApp.exceptions.NoItemsException;
+import com.sgz.TodoApp.entities.Role;
+import com.sgz.TodoApp.exceptions.*;
+import com.sgz.TodoApp.repos.RoleRepo;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,22 +33,28 @@ class AdminServiceTest {
     private JdbcTemplate jdbc;
 
     @Autowired
-    private UserRepo repo;
+    private UserRepo uRepo;
+
+    @Autowired
+    private RoleRepo rRepo;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     private final Set<Role> testRoles = Sets.newHashSet(new Role(1, "USER"));
 
+    private final Role testRole = new Role(1, "USER");
+
     private final String testLongString = "C39V2iGLMtU1xN8tctQQVPnr7Y41mgIqCCPKookK7yrKP9xweAp6Oo7NGOBp6wkWIP1cQZvxW2n40ZK0vUUHWxQzhjUCRnUXFx1uSSKXYP37nlsLcMnmaxpnGY7JGmKap7Q4e1mdtVg3aZ829B3IeMCzxTs2Ex5IOrbgu55cwUKh3z7GBFssVQL4mzr1eHqfOv67prPQgcCQCDIRSEZH1tt0h5yxVgVt2prBdgUWBmo6sg6UPS6k1quBYGDoFBIk";
 
     @BeforeEach
-    void setUp() throws InvalidEntityException, InvalidNameException {
-        repo.deleteAll();
-        jdbc.update("DELETE FROM Roles");
+    void setUp() throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
+        uRepo.deleteAll();
+        rRepo.deleteAll();
         jdbc.update("ALTER TABLE Users auto_increment = 1");
         jdbc.update("ALTER TABLE Roles auto_increment = 1");
-        jdbc.update("INSERT INTO Roles(Authority) VALUES('USER'),('ADMIN')");
+        toTest.createRole(new Role("USER"));
+        toTest.createRole(new Role("ADMIN"));
         toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam"));
         toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam2"));
         toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam3"));
@@ -137,7 +142,7 @@ class AdminServiceTest {
 
     @Test
     void getAllNoItems() {
-        repo.deleteAll();
+        uRepo.deleteAll();
         try {
             toTest.getAll();
             fail("should hit NoItemsException");
@@ -403,6 +408,204 @@ class AdminServiceTest {
     void deleteUserByIdInvalidId() {
         try {
             toTest.deleteUserById(-1);
+            fail("should hit InvalidIdException");
+        } catch (InvalidIdException ex){}
+    }
+
+    @Test
+    void getAllRoles() throws NoItemsException {
+        Role expected = new Role(2, "ADMIN");
+
+        List<Role> fromService = toTest.getAllRoles();
+
+        assertEquals(2, fromService.size());
+        assertTrue(fromService.contains(testRole));
+        assertTrue(fromService.contains(expected));
+    }
+
+    @Test
+    void getAllRolesNoItems() {
+        uRepo.deleteAll();
+        rRepo.deleteAll();
+        try {
+            toTest.getAllRoles();
+            fail("should hit NoItemsException");
+        } catch (NoItemsException ex){}
+    }
+
+    @Test
+    void getRoleById() throws InvalidIdException {
+        Role fromService = toTest.getRoleById(1);
+        assertEquals(testRole, fromService);
+    }
+
+    @Test
+    void getRoleByIdInvalidId() {
+        try {
+            toTest.getRoleById(-1);
+            fail("should hit InvalidIdException");
+        } catch (InvalidIdException ex){}
+    }
+
+    @Test
+    void getRoleByAuthority() throws InvalidAuthorityException, InvalidEntityException {
+        Role fromService = toTest.getRoleByAuthority("USER");
+        assertEquals(testRole, fromService);
+    }
+
+    @Test
+    void getRoleByAuthorityInvalidAuthority() throws InvalidEntityException {
+        try {
+            toTest.getRoleByAuthority("banan");
+            fail("should hit InvalidAuthorityException");
+        } catch (InvalidAuthorityException ex){}
+    }
+
+    @Test
+    void getRoleByAuthorityNullAuthority() throws InvalidAuthorityException {
+        try {
+            toTest.getRoleByAuthority(null);
+            fail("should hit InvalidAuthorityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void getRoleByAuthorityBlankAuthority() throws InvalidAuthorityException {
+        try {
+            toTest.getRoleByAuthority("  ");
+            fail("should hit InvalidAuthorityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void getRoleByAuthorityEmptyAuthority() throws InvalidAuthorityException {
+        try {
+            toTest.getRoleByAuthority("");
+            fail("should hit InvalidAuthorityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+
+    @Test
+    void createRole() throws InvalidEntityException, InvalidAuthorityException, InvalidIdException {
+        Role expected = new Role("GUEST");
+
+        try {
+            toTest.getRoleById(3);
+            fail("should hit InvalidIdException");
+        } catch (InvalidIdException ex){}
+
+        Role fromService = toTest.createRole(expected);
+        expected.setId(3);
+        assertEquals(expected, fromService);
+
+        fromService = toTest.getRoleById(3);
+        assertEquals(expected, fromService);
+    }
+
+    @Test
+    void createRoleInvalidAuthority() throws InvalidEntityException {
+        Role toAdd = new Role("USER");
+        try {
+            toTest.createRole(toAdd);
+            fail("should hit InvalidAuthorityException");
+        } catch(InvalidAuthorityException ex){}
+    }
+
+    @Test
+    void createRoleNullRole() throws InvalidAuthorityException {
+        try {
+            toTest.createRole(null);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
+    }
+
+    @Test
+    void createRoleEmptyAuthority() throws InvalidAuthorityException {
+        Role toAdd = new Role("");
+        try {
+            toTest.createRole(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
+    }
+
+    @Test
+    void createRoleBlankAuthority() throws InvalidAuthorityException {
+        Role toAdd = new Role("  ");
+        try {
+            toTest.createRole(toAdd);
+            fail("should hit InvalidEntityException");
+        } catch(InvalidEntityException ex){}
+    }
+
+    @Test
+    void editRole() throws InvalidEntityException, InvalidIdException {
+        Role toEdit = new Role(1,"GUEST");
+
+        Role fromService = toTest.getRoleById(1);
+        assertEquals(testRole, fromService);
+
+        fromService = toTest.editRole(toEdit);
+        assertEquals(toEdit, fromService);
+
+        fromService = toTest.getRoleById(1);
+        assertNotEquals(testRole, fromService);
+        assertEquals(toEdit, fromService);
+    }
+
+    @Test
+    void editRoleInvalidId() throws InvalidEntityException {
+        Role toEdit = new Role(-1,"GUEST");
+        try {
+            toTest.editRole(toEdit);
+            fail("should hit InvalidIdException");
+        } catch (InvalidIdException ex){}
+    }
+
+    @Test
+    void editRoleNullRole() throws InvalidIdException {
+        Role toEdit = new Role(1,"GUEST");
+        try {
+            toTest.editRole(null);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void editRoleEmptyAuthority() throws InvalidIdException {
+        Role toEdit = new Role(1,"");
+        try {
+            toTest.editRole(toEdit);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void editRoleBlankAuthority() throws InvalidIdException {
+        Role toEdit = new Role(1,"  ");
+        try {
+            toTest.editRole(toEdit);
+            fail("should hit InvalidEntityException");
+        } catch (InvalidEntityException ex){}
+    }
+
+    @Test
+    void deleteRoleById() throws InvalidIdException {
+        Role fromService = toTest.getRoleById(1);
+        assertEquals(testRole, fromService);
+
+        toTest.deleteRoleById(1);
+
+        try {
+            toTest.getRoleById(1);
+            fail("should hit InvalidIdException");
+        } catch (InvalidIdException ex){}
+    }
+
+    @Test
+    void deleteRoleByIdInvalidId() {
+        try {
+            toTest.deleteRoleById(-1);
             fail("should hit InvalidIdException");
         } catch (InvalidIdException ex){}
     }
