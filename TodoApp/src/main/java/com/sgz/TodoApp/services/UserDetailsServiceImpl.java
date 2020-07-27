@@ -1,6 +1,6 @@
 package com.sgz.TodoApp.services;
 
-import com.sgz.TodoApp.entities.ApplicationRole;
+import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         Set<GrantedAuthority> userRoles = new HashSet<>();
 
-        for(ApplicationRole r : u.getAuthorities()){
+        for(Role r : u.getAuthorities()){
             userRoles.add(new SimpleGrantedAuthority("ROLE_" + r.getAuthority()));
         }
 

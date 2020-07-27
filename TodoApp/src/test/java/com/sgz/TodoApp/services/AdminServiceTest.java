@@ -2,7 +2,7 @@ package com.sgz.TodoApp.services;
 
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.TestAppConfig;
-import com.sgz.TodoApp.entities.ApplicationRole;
+import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
@@ -39,7 +39,7 @@ class AdminServiceTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final Set<ApplicationRole> testRoles = Sets.newHashSet(new ApplicationRole(1, "USER"));
+    private final Set<Role> testRoles = Sets.newHashSet(new Role(1, "USER"));
 
     private final String testLongString = "C39V2iGLMtU1xN8tctQQVPnr7Y41mgIqCCPKookK7yrKP9xweAp6Oo7NGOBp6wkWIP1cQZvxW2n40ZK0vUUHWxQzhjUCRnUXFx1uSSKXYP37nlsLcMnmaxpnGY7JGmKap7Q4e1mdtVg3aZ829B3IeMCzxTs2Ex5IOrbgu55cwUKh3z7GBFssVQL4mzr1eHqfOv67prPQgcCQCDIRSEZH1tt0h5yxVgVt2prBdgUWBmo6sg6UPS6k1quBYGDoFBIk";
 
@@ -57,7 +57,7 @@ class AdminServiceTest {
 
     @Test
     void updateUserRole() throws InvalidIdException, InvalidEntityException {
-        Set<ApplicationRole> newRoles = Sets.newHashSet(new ApplicationRole(1, "USER"), new ApplicationRole(2, "ADMIN"));
+        Set<Role> newRoles = Sets.newHashSet(new Role(1, "USER"), new Role(2, "ADMIN"));
 
         ApplicationUser original = new ApplicationUser(1, testRoles, "@amBam20", "Sam");
 

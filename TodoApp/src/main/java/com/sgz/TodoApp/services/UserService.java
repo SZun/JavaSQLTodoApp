@@ -1,7 +1,7 @@
 package com.sgz.TodoApp.services;
 
 import com.google.common.collect.Sets;
-import com.sgz.TodoApp.entities.ApplicationRole;
+import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.ApplicationUser;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
@@ -33,7 +33,7 @@ public class UserService {
         validate(toAdd);
         checkExistsByUsername(toAdd.getUsername());
 
-        toAdd.setAuthorities(Sets.newHashSet(new ApplicationRole(1, "USER")));
+        toAdd.setAuthorities(Sets.newHashSet(new Role(1, "USER")));
         toAdd.setPassword(passwordEncoder.encode(toAdd.getPassword()));
 
         return repo.save(toAdd);
@@ -74,7 +74,7 @@ public class UserService {
         validate(toEdit);
         checkExists(toEdit.getId());
 
-        toEdit.setAuthorities(Sets.newHashSet(new ApplicationRole(1, "USER")));
+        toEdit.setAuthorities(Sets.newHashSet(new Role(1, "USER")));
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
 
         return repo.save(toEdit);

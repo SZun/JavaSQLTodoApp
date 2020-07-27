@@ -5,10 +5,7 @@
  */
 package com.sgz.TodoApp.exceptionhandlers;
 
-import com.sgz.TodoApp.exceptions.InvalidEntityException;
-import com.sgz.TodoApp.exceptions.InvalidIdException;
-import com.sgz.TodoApp.exceptions.InvalidNameException;
-import com.sgz.TodoApp.exceptions.NoItemsException;
+import com.sgz.TodoApp.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -65,6 +62,17 @@ public class ExceptionHandlerController {
         final String CUSTOM_ERR_MESSAGE = "Name entered is invalid";
 
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "InvalidNameException"),
+                HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(InvalidAuthorityException.class)
+    public final ResponseEntity<CustomError> handleInvalidAuthorityException(
+            InvalidAuthorityException ex,
+            WebRequest req) {
+
+        final String CUSTOM_ERR_MESSAGE = "Authroity entered is invalid";
+
+        return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "InvalidAuthorityException"),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
