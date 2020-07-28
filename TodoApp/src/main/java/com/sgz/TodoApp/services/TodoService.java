@@ -8,7 +8,6 @@ package com.sgz.TodoApp.services;
 import com.google.common.base.Strings;
 import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
-import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.repos.TodoRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 /**
  *
@@ -25,8 +23,12 @@ import java.util.Optional;
 @Service
 public class TodoService {
 
+    private final TodoRepo repo;
+
     @Autowired
-    TodoRepo repo;
+    public TodoService(TodoRepo repo) {
+        this.repo = repo;
+    }
 
     public List<Todo> getAll() throws NoItemsException {
         List<Todo> allTodos = repo.findAll();
@@ -36,37 +38,41 @@ public class TodoService {
         return allTodos;
     }
 
-    public Todo getById(int id) throws InvalidIdException {
-        Optional<Todo> toGet = repo.findById(id);
-        if (!toGet.isPresent()) {
-            throw new InvalidIdException("Invalid Id");
-        }
-        return toGet.get();
-    }
+//    public Todo getById(int id) throws InvalidIdException {
+//        Optional<Todo> toGet = repo.findByIdAndUser_Username(id, getUsername());
+//        if (!toGet.isPresent()) {
+//            throw new InvalidIdException("Invalid Id");
+//        }
+//        return toGet.get();
+//    }
 
     public Todo createTodo(Todo toAdd) throws InvalidEntityException {
         validate(toAdd);
         return repo.save(toAdd);
     }
 
-    public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException{
-        validate(toEdit);
-        checkExists(toEdit.getId());
-        
-        return repo.save(toEdit);
-    }
-            
-    public void deleteTodo(int id) throws InvalidIdException {
-        checkExists(id);
-        
-        repo.deleteById(id);
-    }
+//    public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException{
+//        validate(toEdit);
+//        checkExistsByIdAndUsername(toEdit.getId(), getUsername());
+//
+//        return repo.save(toEdit);
+//    }
+//
+//    public void deleteTodo(int id) throws InvalidIdException {
+//        checkExistsByIdAndUsername(id, getUsername());
+//
+//        repo.deleteById(id);
+//    }
+
+//    private String getUsername(){
+//        return SecurityContextHolder.getContext().getAuthentication().getName();
+//    }
     
-    private void checkExists(int id) throws InvalidIdException {
-        if(!repo.existsById(id)){
-            throw new InvalidIdException("Invalid Id");
-        }
-    }
+//    private void checkExistsByIdAndUsername(int id, String username) throws InvalidIdException {
+//        if(!repo.existsByIdAndUser_Username(id, username)){
+//            throw new InvalidIdException("Invalid Id");
+//        }
+//    }
 
     private void validate(Todo toUpsert) throws InvalidEntityException {
         if(toUpsert == null 

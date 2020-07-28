@@ -15,5 +15,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface TodoRepo extends JpaRepository<Todo, Integer> {
-    
+
+//    List<Todo> findAllByUser_Username(String username);
+
+//    Optional<Todo> findByIdAndUser_Username(int id, String username);
+//
+//    boolean existsByIdAndUser_Username(int id, String username);
+
 }

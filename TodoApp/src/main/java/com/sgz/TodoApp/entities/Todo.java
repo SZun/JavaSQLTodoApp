@@ -5,24 +5,12 @@
  */
 package com.sgz.TodoApp.entities;
 
-import java.time.LocalDate;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
+import javax.validation.constraints.*;
+import java.time.LocalDate;
 
 /**
  *
@@ -65,4 +53,16 @@ public class Todo {
     @Column(nullable = false)
     private boolean finished;
 
+//    @ManyToOne
+//    @JoinColumn(name = "Username")
+//    ApplicationUser user;
+//
+//    public Todo(int id, @NotBlank(message = "Name can not be blank") @Size(max = 50, message = "Name can not be more than 50 characters") @NonNull String name, @Size(max = 255, message = "Description can not be more than 255 characters") String description, @NotNull(message = "Start Date can not be null") @FutureOrPresent(message = "Start Date must be in future or today") @NonNull LocalDate startDate, @PastOrPresent(message = "End Date must be in past or today") LocalDate endDate, boolean finished) {
+//        this.id = id;
+//        this.name = name;
+//        this.description = description;
+//        this.startDate = startDate;
+//        this.endDate = endDate;
+//        this.finished = finished;
+//    }
 }
