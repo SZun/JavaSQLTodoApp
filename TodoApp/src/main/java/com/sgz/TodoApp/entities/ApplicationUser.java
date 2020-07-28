@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
-@Entity(name="Users")
+@Entity(name = "Users")
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
@@ -19,7 +19,7 @@ public class ApplicationUser {
     @Id
     private int id;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(name = "Users_Roles",
             joinColumns = {@JoinColumn(name = "User_Id")},
             inverseJoinColumns = {@JoinColumn(name = "Role_Id")})
