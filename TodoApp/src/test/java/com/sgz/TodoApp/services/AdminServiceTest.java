@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,6 +62,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void updateUserRole() throws InvalidIdException, InvalidEntityException {
         Set<Role> newRoles = Sets.newHashSet(new Role(1, "USER", null), new Role(2, "ADMIN", null));
 
@@ -150,6 +152,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void getUserByName() throws InvalidNameException, InvalidEntityException {
         ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
 
@@ -274,6 +277,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void editUser() throws InvalidIdException, InvalidEntityException {
         ApplicationUser original = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
 
@@ -368,6 +372,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void getUserById() throws InvalidIdException {
         ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
 
@@ -388,6 +393,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void deleteUserById() throws InvalidIdException {
         ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
 
@@ -434,6 +440,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void getRoleById() throws InvalidIdException {
         Role fromService = toTest.getRoleById(1);
         assertEquals(testRole, fromService);
@@ -448,6 +455,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void getRoleByAuthority() throws InvalidAuthorityException, InvalidEntityException {
         Role fromService = toTest.getRoleByAuthority("USER");
         assertEquals(testRole, fromService);
@@ -487,6 +495,7 @@ class AdminServiceTest {
 
 
     @Test
+    @Transactional
     void createRole() throws InvalidEntityException, InvalidAuthorityException, InvalidIdException {
         Role expected = new Role("GUEST");
 
@@ -539,6 +548,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void editRole() throws InvalidEntityException, InvalidIdException {
         Role toEdit = new Role(1,"GUEST", null);
 
@@ -590,6 +600,7 @@ class AdminServiceTest {
     }
 
     @Test
+    @Transactional
     void deleteRoleById() throws InvalidIdException {
         Role fromService = toTest.getRoleById(1);
         assertEquals(testRole, fromService);
