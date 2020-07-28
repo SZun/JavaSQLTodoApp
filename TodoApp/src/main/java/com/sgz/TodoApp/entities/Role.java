@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity(name = "Roles")
 @AllArgsConstructor
@@ -22,5 +23,8 @@ public class Role {
     @NonNull
     @Column(nullable = false)
     private String authority;
+
+    @ManyToMany(mappedBy = "authorities")
+    List<ApplicationUser> users;
 
 }

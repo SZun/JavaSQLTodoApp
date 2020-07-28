@@ -41,9 +41,9 @@ class AdminServiceTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final Set<Role> testRoles = Sets.newHashSet(new Role(1, "USER"));
+    private final Set<Role> testRoles = Sets.newHashSet(new Role(1, "USER", null));
 
-    private final Role testRole = new Role(1, "USER");
+    private final Role testRole = new Role(1, "USER", null);
 
     private final String testLongString = "C39V2iGLMtU1xN8tctQQVPnr7Y41mgIqCCPKookK7yrKP9xweAp6Oo7NGOBp6wkWIP1cQZvxW2n40ZK0vUUHWxQzhjUCRnUXFx1uSSKXYP37nlsLcMnmaxpnGY7JGmKap7Q4e1mdtVg3aZ829B3IeMCzxTs2Ex5IOrbgu55cwUKh3z7GBFssVQL4mzr1eHqfOv67prPQgcCQCDIRSEZH1tt0h5yxVgVt2prBdgUWBmo6sg6UPS6k1quBYGDoFBIk";
 
@@ -62,7 +62,7 @@ class AdminServiceTest {
 
     @Test
     void updateUserRole() throws InvalidIdException, InvalidEntityException {
-        Set<Role> newRoles = Sets.newHashSet(new Role(1, "USER"), new Role(2, "ADMIN"));
+        Set<Role> newRoles = Sets.newHashSet(new Role(1, "USER", null), new Role(2, "ADMIN", null));
 
         ApplicationUser original = new ApplicationUser(1, testRoles, "@amBam20", "Sam");
 
@@ -414,7 +414,7 @@ class AdminServiceTest {
 
     @Test
     void getAllRoles() throws NoItemsException {
-        Role expected = new Role(2, "ADMIN");
+        Role expected = new Role(2, "ADMIN", null);
 
         List<Role> fromService = toTest.getAllRoles();
 
@@ -540,7 +540,7 @@ class AdminServiceTest {
 
     @Test
     void editRole() throws InvalidEntityException, InvalidIdException {
-        Role toEdit = new Role(1,"GUEST");
+        Role toEdit = new Role(1,"GUEST", null);
 
         Role fromService = toTest.getRoleById(1);
         assertEquals(testRole, fromService);
@@ -555,7 +555,7 @@ class AdminServiceTest {
 
     @Test
     void editRoleInvalidId() throws InvalidEntityException {
-        Role toEdit = new Role(-1,"GUEST");
+        Role toEdit = new Role(-1,"GUEST", null);
         try {
             toTest.editRole(toEdit);
             fail("should hit InvalidIdException");
@@ -564,7 +564,7 @@ class AdminServiceTest {
 
     @Test
     void editRoleNullRole() throws InvalidIdException {
-        Role toEdit = new Role(1,"GUEST");
+        Role toEdit = new Role(1,"GUEST", null);
         try {
             toTest.editRole(null);
             fail("should hit InvalidEntityException");
@@ -573,7 +573,7 @@ class AdminServiceTest {
 
     @Test
     void editRoleEmptyAuthority() throws InvalidIdException {
-        Role toEdit = new Role(1,"");
+        Role toEdit = new Role(1,"", null);
         try {
             toTest.editRole(toEdit);
             fail("should hit InvalidEntityException");
@@ -582,7 +582,7 @@ class AdminServiceTest {
 
     @Test
     void editRoleBlankAuthority() throws InvalidIdException {
-        Role toEdit = new Role(1,"  ");
+        Role toEdit = new Role(1,"  ", null);
         try {
             toTest.editRole(toEdit);
             fail("should hit InvalidEntityException");

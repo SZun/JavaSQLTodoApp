@@ -15,14 +15,14 @@ import java.util.Optional;
 @Service
 public class AdminService {
 
-    private final UserRepo uRepo;
-    private final RoleRepo rRepo;
+    private final UserRepo userRepo;
+    private final RoleRepo roleRepo;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminService(UserRepo repo, PasswordEncoder passwordEncoder, RoleRepo rRepo) {
-        this.uRepo = repo;
-        this.rRepo = rRepo;
+    public AdminService(UserRepo userRepo, RoleRepo roleRepo, PasswordEncoder passwordEncoder) {
+        this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -30,9 +30,9 @@ public class AdminService {
         if (toEdit == null) throw new InvalidEntityException("Invalid entity");
 
         checkUserExists(toEdit.getId());
-        validateEditRole(toEdit, uRepo.findById(toEdit.getId()).get());
+        validateEditRole(toEdit, userRepo.findById(toEdit.getId()).get());
 
-        return uRepo.save(toEdit);
+        return userRepo.save(toEdit);
     }
 
 
@@ -42,11 +42,11 @@ public class AdminService {
 
         toAdd.setPassword(passwordEncoder.encode(toAdd.getPassword()));
 
-        return uRepo.save(toAdd);
+        return userRepo.save(toAdd);
     }
 
     public List<ApplicationUser> getAll() throws NoItemsException {
-        List<ApplicationUser> allUsers = uRepo.findAll();
+        List<ApplicationUser> allUsers = userRepo.findAll();
         if (allUsers.isEmpty()) {
             throw new NoItemsException("No Items");
         }
@@ -58,7 +58,7 @@ public class AdminService {
             throw new InvalidEntityException("Name is invalid");
         }
 
-        Optional<ApplicationUser> toGet = uRepo.findByUsername(username);
+        Optional<ApplicationUser> toGet = userRepo.findByUsername(username);
         if (!toGet.isPresent()) {
             throw new InvalidNameException("Name not found");
         }
@@ -71,11 +71,11 @@ public class AdminService {
 
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
 
-        return uRepo.save(toEdit);
+        return userRepo.save(toEdit);
     }
 
     public ApplicationUser getUserById(int id) throws InvalidIdException {
-        Optional<ApplicationUser> toGet = uRepo.findById(id);
+        Optional<ApplicationUser> toGet = userRepo.findById(id);
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
         }
@@ -84,11 +84,11 @@ public class AdminService {
 
     public void deleteUserById(int id) throws InvalidIdException {
         checkUserExists(id);
-        uRepo.deleteById(id);
+        userRepo.deleteById(id);
     }
 
     public List<Role> getAllRoles() throws NoItemsException {
-        List<Role> allRoles = rRepo.findAll();
+        List<Role> allRoles = roleRepo.findAll();
         if (allRoles.isEmpty()) {
             throw new NoItemsException("No Items");
         }
@@ -96,7 +96,7 @@ public class AdminService {
     }
 
     public Role getRoleById(int id) throws InvalidIdException {
-        Optional<Role> toGet = rRepo.findById(id);
+        Optional<Role> toGet = roleRepo.findById(id);
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
         }
@@ -108,7 +108,7 @@ public class AdminService {
             throw new InvalidEntityException("Name is invalid");
         }
 
-        Optional<Role> toGet = rRepo.findByAuthority(authority);
+        Optional<Role> toGet = roleRepo.findByAuthority(authority);
         if (!toGet.isPresent()) {
             throw new InvalidAuthorityException("Authority not found");
         }
@@ -120,19 +120,19 @@ public class AdminService {
         validateRole(toAdd);
         checkExistsByAuthority(toAdd.getAuthority());
 
-        return rRepo.save(toAdd);
+        return roleRepo.save(toAdd);
     }
 
     public Role editRole(Role toEdit) throws InvalidEntityException, InvalidIdException {
         validateRole(toEdit);
         checkRoleExists(toEdit.getId());
 
-        return rRepo.save(toEdit);
+        return roleRepo.save(toEdit);
     }
 
     public void deleteRoleById(int id) throws InvalidIdException {
         checkRoleExists(id);
-        rRepo.deleteById(id);
+        roleRepo.deleteById(id);
     }
 
     private void validateEditRole(ApplicationUser toEdit, ApplicationUser original) throws InvalidEntityException {
@@ -168,25 +168,25 @@ public class AdminService {
     }
 
     private void checkExistsByAuthority(String authority) throws InvalidAuthorityException {
-        if (rRepo.existsByAuthority(authority)) {
+        if (roleRepo.existsByAuthority(authority)) {
             throw new InvalidAuthorityException("Authority already in use");
         }
     }
 
     private void checkUserExists(int id) throws InvalidIdException {
-        if (!uRepo.existsById(id)) {
+        if (!userRepo.existsById(id)) {
             throw new InvalidIdException("Invalid Id");
         }
     }
 
     private void checkRoleExists(int id) throws InvalidIdException {
-        if (!rRepo.existsById(id)) {
+        if (!roleRepo.existsById(id)) {
             throw new InvalidIdException("Invalid Id");
         }
     }
 
     private void checkExistsByUsername(String username) throws InvalidNameException {
-        if (uRepo.existsByUsername(username)) {
+        if (userRepo.existsByUsername(username)) {
             throw new InvalidNameException("Name already exists");
         }
     }

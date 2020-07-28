@@ -1,10 +1,7 @@
 package com.sgz.TodoApp.controllers;
 
 import com.sgz.TodoApp.entities.ApplicationUser;
-import com.sgz.TodoApp.exceptions.InvalidEntityException;
-import com.sgz.TodoApp.exceptions.InvalidIdException;
-import com.sgz.TodoApp.exceptions.InvalidNameException;
-import com.sgz.TodoApp.exceptions.NoItemsException;
+import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +20,7 @@ public class UserController {
     UserService service;
 
     @PostMapping("/create")
-    public ResponseEntity<ApplicationUser> createUser(@Valid @RequestBody ApplicationUser toAdd) throws InvalidEntityException, InvalidNameException {
+    public ResponseEntity<ApplicationUser> createUser(@Valid @RequestBody ApplicationUser toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
         return new ResponseEntity(service.createUser(toAdd), HttpStatus.CREATED);
     }
 
@@ -41,7 +38,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
+    public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
 
         try {
             ApplicationUser toCheck = service.getUserByName(toEdit.getUsername());
