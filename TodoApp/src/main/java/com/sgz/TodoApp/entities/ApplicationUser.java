@@ -19,7 +19,7 @@ public class ApplicationUser {
     @Id
     private int id;
 
-    @ManyToMany(cascade = {CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(name = "Users_Roles",
             joinColumns = {@JoinColumn(name = "User_Id")},
             inverseJoinColumns = {@JoinColumn(name = "Role_Id")})
