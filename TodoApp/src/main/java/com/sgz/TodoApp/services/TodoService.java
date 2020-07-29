@@ -28,7 +28,7 @@ public class TodoService {
     @Autowired
     TodoRepo repo;
 
-    public List<Todo> getAll() throws NoItemsException {
+    public List<Todo> getAllTodos() throws NoItemsException {
         List<Todo> allTodos = repo.findAll();
         if (allTodos.isEmpty()) {
             throw new NoItemsException("No Items");
@@ -36,7 +36,7 @@ public class TodoService {
         return allTodos;
     }
 
-    public Todo getById(int id) throws InvalidIdException {
+    public Todo getTodoById(int id) throws InvalidIdException {
         Optional<Todo> toGet = repo.findById(id);
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
@@ -45,12 +45,12 @@ public class TodoService {
     }
 
     public Todo createTodo(Todo toAdd) throws InvalidEntityException {
-        validate(toAdd);
+        validateTodo(toAdd);
         return repo.save(toAdd);
     }
 
     public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException{
-        validate(toEdit);
+        validateTodo(toEdit);
         checkExists(toEdit.getId());
         
         return repo.save(toEdit);
@@ -68,7 +68,7 @@ public class TodoService {
         }
     }
 
-    private void validate(Todo toUpsert) throws InvalidEntityException {
+    private void validateTodo(Todo toUpsert) throws InvalidEntityException {
         if(toUpsert == null 
             || Strings.isNullOrEmpty(toUpsert.getName().trim())
             || toUpsert.getName().trim().length() > 50

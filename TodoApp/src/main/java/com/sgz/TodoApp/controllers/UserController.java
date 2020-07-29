@@ -27,7 +27,7 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<User>> getAllUsers() throws NoItemsException {
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(service.getAllUsers());
     }
 
     @GetMapping("/{id}")

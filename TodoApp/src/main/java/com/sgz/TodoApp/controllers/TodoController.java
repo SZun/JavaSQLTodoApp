@@ -33,13 +33,13 @@ public class TodoController {
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<Todo>> getAll() throws NoItemsException{
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(service.getAllTodos());
     }
     
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Todo> getById(@PathVariable int id) throws InvalidIdException {
-        return ResponseEntity.ok(service.getById(id));
+        return ResponseEntity.ok(service.getTodoById(id));
     }
     
     @DeleteMapping("/{id}")

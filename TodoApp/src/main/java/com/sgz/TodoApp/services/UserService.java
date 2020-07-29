@@ -11,7 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,22 +35,14 @@ public class UserService {
         toAdd.setRoles(Sets.newHashSet(getRoleByAuthority("USER")));
         toAdd.setPassword(passwordEncoder.encode(toAdd.getPassword()));
 
-        User toReturn = userRepo.save(toAdd);
-        toReturn.getRoles().forEach(r -> r.setUsers(null));
-
-        return toReturn;
+        return userRepo.save(toAdd);
     }
 
-    public List<User> getAll() throws NoItemsException {
+    public List<User> getAllUsers() throws NoItemsException {
         List<User> allUsers = userRepo.findAll();
         if (allUsers.isEmpty()) {
             throw new NoItemsException("No Items");
         }
-
-        allUsers.forEach(u -> {
-            u.setPassword("");
-            u.setRoles(new HashSet<>());
-        });
 
         return allUsers;
     }
@@ -66,11 +57,7 @@ public class UserService {
             throw new InvalidNameException("Name not found");
         }
 
-        User toReturn = toGet.get();
-        toReturn.setPassword("");
-        toReturn.setRoles(new HashSet<>());
-
-        return toReturn;
+        return toGet.get();
     }
 
     public User editUser(User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
@@ -81,7 +68,6 @@ public class UserService {
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
 
         User toReturn = userRepo.save(toEdit);
-        toReturn.getRoles().forEach(r -> r.setUsers(null));
 
         return toReturn;
     }
@@ -92,11 +78,7 @@ public class UserService {
             throw new InvalidIdException("Invalid Id");
         }
 
-        User toReturn = toGet.get();
-        toReturn.setPassword("");
-        toReturn.setRoles(new HashSet<>());
-
-        return toReturn;
+        return toGet.get();
     }
 
     public void deleteUserById(int id) throws InvalidIdException {

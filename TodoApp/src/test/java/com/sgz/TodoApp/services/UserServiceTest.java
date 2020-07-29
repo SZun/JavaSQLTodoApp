@@ -56,11 +56,11 @@ class UserServiceTest {
     }
 
     @Test
-    void getAll() throws NoItemsException {
+    void getAllUsers() throws NoItemsException {
         User expected2 = new User(2, "", "Sam2", new HashSet<>());
         User expected3 = new User(3, "", "Sam3", new HashSet<>());
 
-        List<User> fromService = toTest.getAll();
+        List<User> fromService = toTest.getAllUsers();
 
         assertEquals(3, fromService.size());
         assertTrue(fromService.contains(expected));
@@ -69,10 +69,10 @@ class UserServiceTest {
     }
 
     @Test
-    void getAllNoItems() {
+    void getAllUsersNoItems() {
         repo.deleteAll();
         try {
-            toTest.getAll();
+            toTest.getAllUsers();
             fail("should hit NoItemsException");
         } catch (NoItemsException ex) {
         }

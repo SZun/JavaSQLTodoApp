@@ -69,14 +69,14 @@ public class TodoServiceTest {
     }
 
     /**
-     * Test of getAll method, of class TodoService.
+     * Test of getAllTodos method, of class TodoService.
      */
     @Test
-    public void testGetAll() throws NoItemsException {
+    public void testGetAllTodos() throws NoItemsException {
         Todo expected2 = new Todo(2, "Dishes", null, LocalDate.now(), null, false);
         Todo expected3 = new Todo(3, "Clean Up After Dog", null, LocalDate.now(), null, false);
 
-        List<Todo> fromService = toTest.getAll();
+        List<Todo> fromService = toTest.getAllTodos();
 
         assertEquals(3, fromService.size());
         assertTrue(fromService.contains(testTodo));
@@ -85,21 +85,21 @@ public class TodoServiceTest {
     }
     
     @Test
-    public void testGetAllNoItems() {
+    public void testGetAllTodosNoItems() {
         repo.deleteAll();
         
         try {
-            toTest.getAll();
+            toTest.getAllTodos();
         } catch(NoItemsException ex){}
     }
 
     /**
-     * Test of getById method, of class TodoService.
+     * Test of getTodoById method, of class TodoService.
      */
     @Test
     public void testGetById() throws InvalidIdException {
         
-        Todo fromService = toTest.getById(1);
+        Todo fromService = toTest.getTodoById(1);
         
         assertEquals(testTodo, fromService);
         
@@ -108,7 +108,7 @@ public class TodoServiceTest {
     @Test
     public void testGetByIdInvalidId() {
         try {
-            toTest.getById(-1);
+            toTest.getTodoById(-1);
             fail("should hit InvalidIdException when Id is invalid");
         } catch(InvalidIdException ex){}
     }
@@ -207,13 +207,13 @@ public class TodoServiceTest {
     public void testEditTodo() throws InvalidIdException, InvalidEntityException {
         Todo expected = new Todo(1, "Laundry", "Landry Done", LocalDate.now(), LocalDate.now(), true);
         
-        Todo fromService = toTest.getById(1);
+        Todo fromService = toTest.getTodoById(1);
         assertEquals(testTodo, fromService);
         
         fromService = toTest.editTodo(expected);
         assertEquals(expected, fromService);
         
-        fromService = toTest.getById(1);
+        fromService = toTest.getTodoById(1);
         assertNotEquals(testTodo, fromService);
         assertEquals(expected, fromService);
     }
@@ -309,13 +309,13 @@ public class TodoServiceTest {
      */
     @Test
     public void testDeleteTodo() throws InvalidIdException {
-        Todo fromService = toTest.getById(1);
+        Todo fromService = toTest.getTodoById(1);
         assertEquals(testTodo, fromService);
         
         toTest.deleteTodo(1);
         
         try {
-            toTest.getById(1);
+            toTest.getTodoById(1);
             fail("should hit InvalidIdException when Id is invalid");
         } catch(InvalidIdException ex){}
     }
