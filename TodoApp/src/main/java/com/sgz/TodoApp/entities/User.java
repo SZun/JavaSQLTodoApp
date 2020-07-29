@@ -42,12 +42,11 @@ public class User {
     @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
 
-    public User(Set<Role> roles, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
+    public User(Set<Role> roles, String password, String username) {
         this.roles = roles;
         this.password = password;
         this.username = username;
     }
-
 
 }
 
