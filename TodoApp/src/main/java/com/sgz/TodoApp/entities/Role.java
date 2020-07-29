@@ -1,6 +1,7 @@
 package com.sgz.TodoApp.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,6 +10,9 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 @Data
 @Entity
 @Table(name = "roles")
@@ -28,7 +32,7 @@ public class Role {
     private String authority;
 
     @ManyToMany(mappedBy = "roles")
-    @JsonBackReference
+//    @JsonBackReference
     private List<User> users = new ArrayList<>();
 
 }
