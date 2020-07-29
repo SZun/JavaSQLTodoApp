@@ -1,7 +1,8 @@
 package com.sgz.TodoApp.services;
 
-import com.sgz.TodoApp.entities.User;
+import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.Role;
+import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.repos.RoleRepo;
 import com.sgz.TodoApp.repos.UserRepo;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class UserService {
@@ -33,13 +33,13 @@ public class UserService {
         validate(toAdd);
         checkExistsByUsername(toAdd.getUsername());
 
-        Set<Role> authorities = new HashSet<>();
-        authorities.add(getRoleByAuthority("USER"));
-
-        toAdd.setRoles(authorities);
+        toAdd.setRoles(Sets.newHashSet(getRoleByAuthority("USER")));
         toAdd.setPassword(passwordEncoder.encode(toAdd.getPassword()));
 
-        return userRepo.save(toAdd);
+        User toReturn = userRepo.save(toAdd);
+        toReturn.getRoles().forEach(r -> r.setUsers(null));
+
+        return toReturn;
     }
 
     public List<User> getAll() throws NoItemsException {
@@ -77,13 +77,13 @@ public class UserService {
         validate(toEdit);
         checkExists(toEdit.getId());
 
-        Set<Role> authorities = new HashSet<>();
-        authorities.add(getRoleByAuthority("USER"));
-
-        toEdit.setRoles(authorities);
+        toEdit.setRoles(Sets.newHashSet(getRoleByAuthority("USER")));
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
 
-        return userRepo.save(toEdit);
+        User toReturn = userRepo.save(toEdit);
+        toReturn.getRoles().forEach(r -> r.setUsers(null));
+
+        return toReturn;
     }
 
     public User getUserById(int id) throws InvalidIdException {

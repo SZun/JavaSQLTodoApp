@@ -32,7 +32,6 @@ public class Role {
     private String authority;
 
     @ManyToMany(mappedBy = "roles")
-//    @JsonBackReference
     private List<User> users = new ArrayList<>();
 
 }

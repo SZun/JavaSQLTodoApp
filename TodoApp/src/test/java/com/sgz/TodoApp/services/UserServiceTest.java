@@ -216,20 +216,21 @@ class UserServiceTest {
         User fromService = toTest.getUserById(1);
         assertEquals(expected, fromService);
 
-        User toEdit = new User(1, "@amBam21", "Sammy", testRoles);
+        User toEdit = new User(1, "@amBam21", "Sammy");
         fromService = toTest.editUser(toEdit);
 
-        assertEquals(toEdit, fromService);
+        User edited = new User(1,"@amBam21","Sammy",testRoles );
 
-        assertEquals(expected.getId(), fromService.getId());
-        assertEquals(testRoles, fromService.getRoles());
-        assertFalse(passwordEncoder.matches(expected.getPassword(), fromService.getPassword()));
-        assertNotEquals(expected.getUsername(), fromService.getUsername());
+        assertEquals(edited.getId(), fromService.getId());
+        assertTrue(passwordEncoder.matches(edited.getPassword(), fromService.getPassword()));
+        assertEquals(edited.getUsername(), fromService.getUsername());
+        assertEquals(edited.getRoles(), fromService.getRoles());
+
+        edited.setPassword("");
+        edited.setRoles(new HashSet<>());
 
         fromService = toTest.getUserById(1);
-        toEdit.setRoles(new HashSet<>());
-        toEdit.setPassword("");
-        assertEquals(toEdit, fromService);
+        assertEquals(edited, fromService);
         assertNotEquals(expected, fromService);
     }
 

@@ -43,7 +43,6 @@ public class User {
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
-//    @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
 
     public User(Set<Role> roles, String password, String username) {
@@ -52,5 +51,10 @@ public class User {
         this.username = username;
     }
 
+    public User(int id, String password, String username) {
+        this.id = id;
+        this.password = password;
+        this.username = username;
+    }
 }
 
