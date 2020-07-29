@@ -1,6 +1,6 @@
 package com.sgz.TodoApp.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,13 +27,8 @@ public class Role {
     @Column(nullable = false)
     private String authority;
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-//                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            },
-            mappedBy = "roles")
-    @JsonIgnoreProperties
+    @ManyToMany(mappedBy = "roles")
+    @JsonBackReference
     private List<User> users = new ArrayList<>();
 
 }

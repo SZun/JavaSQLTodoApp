@@ -1,6 +1,6 @@
 package com.sgz.TodoApp.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -35,15 +35,11 @@ public class User {
     private String username;
 
 
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-//                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
+    @ManyToMany
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    @JsonIgnoreProperties
+    @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
 
     public User(Set<Role> roles, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
