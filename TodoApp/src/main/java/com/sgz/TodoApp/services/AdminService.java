@@ -1,6 +1,6 @@
 package com.sgz.TodoApp.services;
 
-import com.sgz.TodoApp.entities.ApplicationUser;
+import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.repos.RoleRepo;
@@ -26,7 +26,7 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ApplicationUser updateUserRole(ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
+    public User updateUserRole(User toEdit) throws InvalidEntityException, InvalidIdException {
         if (toEdit == null) throw new InvalidEntityException("Invalid entity");
 
         checkUserExists(toEdit.getId());
@@ -36,7 +36,7 @@ public class AdminService {
     }
 
 
-    public ApplicationUser createUser(ApplicationUser toAdd) throws InvalidEntityException, InvalidNameException {
+    public User createUser(User toAdd) throws InvalidEntityException, InvalidNameException {
         validate(toAdd);
         checkExistsByUsername(toAdd.getUsername());
 
@@ -45,27 +45,27 @@ public class AdminService {
         return userRepo.save(toAdd);
     }
 
-    public List<ApplicationUser> getAll() throws NoItemsException {
-        List<ApplicationUser> allUsers = userRepo.findAll();
+    public List<User> getAll() throws NoItemsException {
+        List<User> allUsers = userRepo.findAll();
         if (allUsers.isEmpty()) {
             throw new NoItemsException("No Items");
         }
         return allUsers;
     }
 
-    public ApplicationUser getUserByName(String username) throws InvalidEntityException, InvalidNameException {
+    public User getUserByName(String username) throws InvalidEntityException, InvalidNameException {
         if (username == null || username.trim().isEmpty()) {
             throw new InvalidEntityException("Name is invalid");
         }
 
-        Optional<ApplicationUser> toGet = userRepo.findByUsername(username);
+        Optional<User> toGet = userRepo.findByUsername(username);
         if (!toGet.isPresent()) {
             throw new InvalidNameException("Name not found");
         }
         return toGet.get();
     }
 
-    public ApplicationUser editUser(ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
+    public User editUser(User toEdit) throws InvalidEntityException, InvalidIdException {
         validate(toEdit);
         checkUserExists(toEdit.getId());
 
@@ -74,8 +74,8 @@ public class AdminService {
         return userRepo.save(toEdit);
     }
 
-    public ApplicationUser getUserById(int id) throws InvalidIdException {
-        Optional<ApplicationUser> toGet = userRepo.findById(id);
+    public User getUserById(int id) throws InvalidIdException {
+        Optional<User> toGet = userRepo.findById(id);
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
         }
@@ -135,10 +135,10 @@ public class AdminService {
         roleRepo.deleteById(id);
     }
 
-    private void validateEditRole(ApplicationUser toEdit, ApplicationUser original) throws InvalidEntityException {
+    private void validateEditRole(User toEdit, User original) throws InvalidEntityException {
         if (original == null
-                || toEdit.getAuthorities() == null
-                || toEdit.getAuthorities().isEmpty()
+                || toEdit.getRoles() == null
+                || toEdit.getRoles().isEmpty()
                 || original.getId() != toEdit.getId()
                 || !original.getUsername().equals(toEdit.getUsername())
                 || !original.getPassword().equals(toEdit.getPassword())
@@ -147,7 +147,7 @@ public class AdminService {
         }
     }
 
-    private void validate(ApplicationUser toUpsert) throws InvalidEntityException {
+    private void validate(User toUpsert) throws InvalidEntityException {
         if (toUpsert == null
                 || toUpsert.getUsername().trim().isEmpty()
                 || toUpsert.getUsername().trim().length() > 50

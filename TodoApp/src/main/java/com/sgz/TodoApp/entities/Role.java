@@ -5,9 +5,11 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "Roles")
+@Entity
+@Table(name = "roles")
 @AllArgsConstructor
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class Role {
     @Column(nullable = false)
     private String authority;
 
-    @ManyToMany(mappedBy = "authorities")
-    List<ApplicationUser> users;
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
+    private List<User> users = new ArrayList<>();
 
 }

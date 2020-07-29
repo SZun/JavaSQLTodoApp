@@ -1,6 +1,6 @@
 package com.sgz.TodoApp.services;
 
-import com.sgz.TodoApp.entities.ApplicationUser;
+import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.repos.RoleRepo;
@@ -29,72 +29,72 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ApplicationUser createUser(ApplicationUser toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
+    public User createUser(User toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
         validate(toAdd);
         checkExistsByUsername(toAdd.getUsername());
 
         Set<Role> authorities = new HashSet<>();
         authorities.add(getRoleByAuthority("USER"));
 
-        toAdd.setAuthorities(authorities);
+        toAdd.setRoles(authorities);
         toAdd.setPassword(passwordEncoder.encode(toAdd.getPassword()));
 
         return userRepo.save(toAdd);
     }
 
-    public List<ApplicationUser> getAll() throws NoItemsException {
-        List<ApplicationUser> allUsers = userRepo.findAll();
+    public List<User> getAll() throws NoItemsException {
+        List<User> allUsers = userRepo.findAll();
         if (allUsers.isEmpty()) {
             throw new NoItemsException("No Items");
         }
 
         allUsers.forEach(u -> {
             u.setPassword("");
-            u.setAuthorities(new HashSet<>());
+            u.setRoles(new HashSet<>());
         });
 
         return allUsers;
     }
 
-    public ApplicationUser getUserByName(String username) throws InvalidEntityException, InvalidNameException {
+    public User getUserByName(String username) throws InvalidEntityException, InvalidNameException {
         if (username == null || username.trim().isEmpty()) {
             throw new InvalidEntityException("Name is invalid");
         }
 
-        Optional<ApplicationUser> toGet = userRepo.findByUsername(username);
+        Optional<User> toGet = userRepo.findByUsername(username);
         if (!toGet.isPresent()) {
             throw new InvalidNameException("Name not found");
         }
 
-        ApplicationUser toReturn = toGet.get();
+        User toReturn = toGet.get();
         toReturn.setPassword("");
-        toReturn.setAuthorities(new HashSet<>());
+        toReturn.setRoles(new HashSet<>());
 
         return toReturn;
     }
 
-    public ApplicationUser editUser(ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
+    public User editUser(User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
         validate(toEdit);
         checkExists(toEdit.getId());
 
         Set<Role> authorities = new HashSet<>();
         authorities.add(getRoleByAuthority("USER"));
 
-        toEdit.setAuthorities(authorities);
+        toEdit.setRoles(authorities);
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
 
         return userRepo.save(toEdit);
     }
 
-    public ApplicationUser getUserById(int id) throws InvalidIdException {
-        Optional<ApplicationUser> toGet = userRepo.findById(id);
+    public User getUserById(int id) throws InvalidIdException {
+        Optional<User> toGet = userRepo.findById(id);
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
         }
 
-        ApplicationUser toReturn = toGet.get();
+        User toReturn = toGet.get();
         toReturn.setPassword("");
-        toReturn.setAuthorities(new HashSet<>());
+        toReturn.setRoles(new HashSet<>());
 
         return toReturn;
     }
@@ -129,7 +129,7 @@ public class UserService {
         }
     }
 
-    private void validate(ApplicationUser toUpsert) throws InvalidEntityException {
+    private void validate(User toUpsert) throws InvalidEntityException {
         if (toUpsert == null
                 || toUpsert.getUsername().trim().isEmpty()
                 || toUpsert.getUsername().trim().length() > 50

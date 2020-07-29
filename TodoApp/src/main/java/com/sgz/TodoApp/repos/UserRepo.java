@@ -1,15 +1,15 @@
 package com.sgz.TodoApp.repos;
 
-import com.sgz.TodoApp.entities.ApplicationUser;
+import com.sgz.TodoApp.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepo extends JpaRepository<ApplicationUser, Integer> {
+public interface UserRepo extends JpaRepository<User, Integer> {
 
-    Optional<ApplicationUser> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
     boolean existsByUsername(String username);
 }

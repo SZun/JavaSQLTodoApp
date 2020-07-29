@@ -2,7 +2,7 @@ package com.sgz.TodoApp.services;
 
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.TestAppConfig;
-import com.sgz.TodoApp.entities.ApplicationUser;
+import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.repos.RoleRepo;
@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,31 +56,31 @@ class AdminServiceTest {
         jdbc.update("ALTER TABLE Roles auto_increment = 1");
         toTest.createRole(new Role("USER"));
         toTest.createRole(new Role("ADMIN"));
-        toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam"));
-        toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam2"));
-        toTest.createUser(new ApplicationUser(testRoles, "@amBam20","Sam3"));
+        toTest.createUser(new User(testRoles, "@amBam20","Sam"));
+        toTest.createUser(new User(testRoles, "@amBam20","Sam2"));
+        toTest.createUser(new User(testRoles, "@amBam20","Sam3"));
     }
 
     @Test
     void updateUserRole() throws InvalidIdException, InvalidEntityException {
         Set<Role> newRoles = Sets.newHashSet(new Role(1, "USER", null), new Role(2, "ADMIN", null));
 
-        ApplicationUser original = new ApplicationUser(1, testRoles, "@amBam20", "Sam");
+        User original = new User(1, testRoles, "@amBam20", "Sam");
 
-        ApplicationUser fromService = toTest.getUserById(1);
+        User fromService = toTest.getUserById(1);
 
         assertEquals(original.getId(), fromService.getId());
-        assertEquals(original.getAuthorities(), fromService.getAuthorities());
+        assertEquals(original.getRoles(), fromService.getRoles());
         assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
         assertEquals(original.getUsername(), fromService.getUsername());
 
-        ApplicationUser expected = new ApplicationUser(1, newRoles, fromService.getPassword(), "Sam");
+        User expected = new User(1, newRoles, fromService.getPassword(), "Sam");
 
         fromService = toTest.updateUserRole(expected);
         assertEquals(fromService, expected);
 
         assertEquals(original.getId(), fromService.getId());
-        assertNotEquals(original.getAuthorities(), fromService.getAuthorities());
+        assertNotEquals(original.getRoles(), fromService.getRoles());
         assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
         assertEquals(original.getUsername(), fromService.getUsername());
 
@@ -89,7 +90,7 @@ class AdminServiceTest {
 
     @Test
     void updateUserRoleInvalidId() throws InvalidEntityException {
-        ApplicationUser testUser = new ApplicationUser(-1, testRoles, "@amBam20", "Sam");
+        User testUser = new User(-1, testRoles, "@amBam20", "Sam");
         try {
             toTest.updateUserRole(testUser);
             fail("should hit InvalidIdException");
@@ -106,7 +107,7 @@ class AdminServiceTest {
 
     @Test
     void updateUserRoleEmptyAuthorities() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, new HashSet<>(), "@amBam20", "Sam");
+        User testUser = new User(1, new HashSet<>(), "@amBam20", "Sam");
         try {
             toTest.updateUserRole(testUser);
             fail("should hit InvalidEntityException");
@@ -115,7 +116,7 @@ class AdminServiceTest {
 
     @Test
     void updateUserRoleNullAuthorities() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, null, "@amBam20", "Sam");
+        User testUser = new User(1, null, "@amBam20", "Sam");
         try {
             toTest.updateUserRole(testUser);
             fail("should hit InvalidEntityException");
@@ -124,7 +125,7 @@ class AdminServiceTest {
 
     @Test
     void updateUserRoleNameDiff() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, testRoles, "@amBam20", "Sammy");
+        User testUser = new User(1, testRoles, "@amBam20", "Sammy");
         try {
             toTest.updateUserRole(testUser);
             fail("should hit InvalidEntityException");
@@ -133,7 +134,7 @@ class AdminServiceTest {
 
     @Test
     void updateUserRolePasswordDiff() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, testRoles, "@amBam22", "Sam");
+        User testUser = new User(1, testRoles, "@amBam22", "Sam");
         try {
             toTest.updateUserRole(testUser);
             fail("should hit InvalidEntityException");
@@ -151,12 +152,12 @@ class AdminServiceTest {
 
     @Test
     void getUserByName() throws InvalidNameException, InvalidEntityException {
-        ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
+        User expected = new User(1,testRoles,"@amBam20", "Sam");
 
-        ApplicationUser fromService = toTest.getUserByName("Sam");
+        User fromService = toTest.getUserByName("Sam");
 
         assertEquals(expected.getId(), fromService.getId());
-        assertEquals(expected.getAuthorities(), fromService.getAuthorities());
+        assertEquals(expected.getRoles(), fromService.getRoles());
         assertTrue(passwordEncoder.matches(expected.getPassword(), fromService.getPassword()));
         assertEquals(expected.getUsername(), fromService.getUsername());
     }
@@ -195,15 +196,15 @@ class AdminServiceTest {
 
     @Test
     void createUser() throws InvalidEntityException, InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"@amBam20", "Sammy");
+        User toAdd = new User(testRoles,"@amBam20", "Sammy");
 
-        ApplicationUser fromService = toTest.createUser(toAdd);
+        User fromService = toTest.createUser(toAdd);
         assertEquals(toAdd, fromService);
     }
 
     @Test
     void createUserInvalidName() throws InvalidEntityException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"@amBam20", "Sam");
+        User toAdd = new User(testRoles,"@amBam20", "Sam");
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidNameException");
@@ -212,7 +213,7 @@ class AdminServiceTest {
 
     @Test
     void createUserEmptyPassword() throws InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"", "Sammy");
+        User toAdd = new User(testRoles,"", "Sammy");
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidEntityException");
@@ -221,7 +222,7 @@ class AdminServiceTest {
 
     @Test
     void createUserEmptyName() throws InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"@amBam20", "");
+        User toAdd = new User(testRoles,"@amBam20", "");
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidEntityException");
@@ -230,7 +231,7 @@ class AdminServiceTest {
 
     @Test
     void createUserBlankPassword() throws InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"   ", "Sammy");
+        User toAdd = new User(testRoles,"   ", "Sammy");
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidEntityException");
@@ -239,7 +240,7 @@ class AdminServiceTest {
 
     @Test
     void createUserBlankName() throws InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"@amBam20", "   ");
+        User toAdd = new User(testRoles,"@amBam20", "   ");
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidEntityException");
@@ -248,7 +249,7 @@ class AdminServiceTest {
 
     @Test
     void createUserTooLongPassword() throws InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,testLongString, "Sammy");
+        User toAdd = new User(testRoles,testLongString, "Sammy");
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidEntityException");
@@ -257,7 +258,7 @@ class AdminServiceTest {
 
     @Test
     void createUserTooLongName() throws InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"@amBam20", testLongString);
+        User toAdd = new User(testRoles,"@amBam20", testLongString);
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidEntityException");
@@ -266,7 +267,7 @@ class AdminServiceTest {
 
     @Test
     void createUserInvalidPassword() throws InvalidNameException {
-        ApplicationUser toAdd = new ApplicationUser(testRoles,"password", "Sammy");
+        User toAdd = new User(testRoles,"password", "Sammy");
         try {
             toTest.createUser(toAdd);
             fail("should hit InvalidEntityException");
@@ -275,20 +276,20 @@ class AdminServiceTest {
 
     @Test
     void editUser() throws InvalidIdException, InvalidEntityException {
-        ApplicationUser original = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
+        User original = new User(1,testRoles,"@amBam20", "Sam");
 
-        ApplicationUser fromService = toTest.getUserById(1);
+        User fromService = toTest.getUserById(1);
 
         assertEquals(original.getId(), fromService.getId());
-        assertEquals(original.getAuthorities(), fromService.getAuthorities());
+        assertEquals(original.getRoles(), fromService.getRoles());
         assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
         assertEquals(original.getUsername(), fromService.getUsername());
 
-        ApplicationUser expected = new ApplicationUser(1, testRoles,"@amBam21", "Sammy");
+        User expected = new User(1, testRoles,"@amBam21", "Sammy");
         fromService = toTest.editUser(expected);
 
         assertEquals(original.getId(), fromService.getId());
-        assertEquals(original.getAuthorities(), fromService.getAuthorities());
+        assertEquals(original.getRoles(), fromService.getRoles());
         assertEquals(expected,fromService);
         assertFalse(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
         assertNotEquals(original.getUsername(), fromService.getUsername());
@@ -297,7 +298,7 @@ class AdminServiceTest {
 
     @Test
     void editUserEmptyPassword() throws InvalidIdException {
-        ApplicationUser toEdit = new ApplicationUser(1,testRoles,"", "Sammy");
+        User toEdit = new User(1,testRoles,"", "Sammy");
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -306,7 +307,7 @@ class AdminServiceTest {
 
     @Test
     void editUserEmptyName() throws InvalidIdException {
-        ApplicationUser toEdit = new ApplicationUser(1,testRoles,"@amBam20", "");
+        User toEdit = new User(1,testRoles,"@amBam20", "");
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -315,7 +316,7 @@ class AdminServiceTest {
 
     @Test
     void editUserTooLongPassword() throws InvalidIdException {
-        ApplicationUser toEdit = new ApplicationUser(1,testRoles,testLongString, "Sammy");
+        User toEdit = new User(1,testRoles,testLongString, "Sammy");
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -324,7 +325,7 @@ class AdminServiceTest {
 
     @Test
     void editUserTooLongName() throws InvalidIdException {
-        ApplicationUser toEdit = new ApplicationUser(1,testRoles,"@amBam20", testLongString);
+        User toEdit = new User(1,testRoles,"@amBam20", testLongString);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -333,7 +334,7 @@ class AdminServiceTest {
 
     @Test
     void editUserBlankPassword() throws InvalidIdException {
-        ApplicationUser toEdit = new ApplicationUser(1,testRoles,"  ", "Sammy");
+        User toEdit = new User(1,testRoles,"  ", "Sammy");
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -342,7 +343,7 @@ class AdminServiceTest {
 
     @Test
     void editUserBlankName() throws InvalidIdException {
-        ApplicationUser toEdit = new ApplicationUser(1,testRoles,"@amBam20", "  ");
+        User toEdit = new User(1,testRoles,"@amBam20", "  ");
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -351,7 +352,7 @@ class AdminServiceTest {
 
     @Test
     void editUserInvalidPassword() throws InvalidIdException {
-        ApplicationUser toEdit = new ApplicationUser(1,testRoles,"password", "Sammy");
+        User toEdit = new User(1,testRoles,"password", "Sammy");
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -360,7 +361,7 @@ class AdminServiceTest {
 
     @Test
     void editUserInvalidId() throws InvalidEntityException {
-        ApplicationUser toEdit = new ApplicationUser(-1,testRoles,"@amBam20", "Sammy");
+        User toEdit = new User(-1,testRoles,"@amBam20", "Sammy");
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidIdException");
@@ -369,12 +370,12 @@ class AdminServiceTest {
 
     @Test
     void getUserById() throws InvalidIdException {
-        ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
+        User expected = new User(1,testRoles,"@amBam20", "Sam");
 
-        ApplicationUser fromService = toTest.getUserById(1);
+        User fromService = toTest.getUserById(1);
 
         assertEquals(expected.getId(), fromService.getId());
-        assertEquals(expected.getAuthorities(), fromService.getAuthorities());
+        assertEquals(expected.getRoles(), fromService.getRoles());
         assertTrue(passwordEncoder.matches(expected.getPassword(), fromService.getPassword()));
         assertEquals(expected.getUsername(), fromService.getUsername());
     }
@@ -389,12 +390,12 @@ class AdminServiceTest {
 
     @Test
     void deleteUserById() throws InvalidIdException {
-        ApplicationUser expected = new ApplicationUser(1,testRoles,"@amBam20", "Sam");
+        User expected = new User(1,testRoles,"@amBam20", "Sam");
 
-        ApplicationUser fromService = toTest.getUserById(1);
+        User fromService = toTest.getUserById(1);
 
         assertEquals(expected.getId(), fromService.getId());
-        assertEquals(expected.getAuthorities(), fromService.getAuthorities());
+        assertEquals(expected.getRoles(), fromService.getRoles());
         assertTrue(passwordEncoder.matches(expected.getPassword(), fromService.getPassword()));
         assertEquals(expected.getUsername(), fromService.getUsername());
 
@@ -540,7 +541,7 @@ class AdminServiceTest {
 
     @Test
     void editRole() throws InvalidEntityException, InvalidIdException {
-        Role toEdit = new Role(1,"GUEST", null);
+        Role toEdit = new Role(1,"GUEST", new ArrayList<>());
 
         Role fromService = toTest.getRoleById(1);
         assertEquals(testRole, fromService);

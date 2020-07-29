@@ -1,6 +1,6 @@
 package com.sgz.TodoApp.controllers;
 
-import com.sgz.TodoApp.entities.ApplicationUser;
+import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,28 +20,28 @@ public class UserController {
     UserService service;
 
     @PostMapping("/create")
-    public ResponseEntity<ApplicationUser> createUser(@Valid @RequestBody ApplicationUser toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
         return new ResponseEntity(service.createUser(toAdd), HttpStatus.CREATED);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<List<ApplicationUser>> getAllUsers() throws NoItemsException {
+    public ResponseEntity<List<User>> getAllUsers() throws NoItemsException {
         return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApplicationUser> getUserById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<User> getUserById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(service.getUserById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
+    public ResponseEntity<User> updateUserById(@PathVariable int id, @Valid @RequestBody User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
 
         try {
-            ApplicationUser toCheck = service.getUserByName(toEdit.getUsername());
+            User toCheck = service.getUserByName(toEdit.getUsername());
             if(toCheck.getId() != id){
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
@@ -53,7 +53,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole(ROLE_USER)")
-    public ResponseEntity<ApplicationUser> deleteUserById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<User> deleteUserById(@PathVariable int id) throws InvalidIdException {
         service.deleteUserById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
