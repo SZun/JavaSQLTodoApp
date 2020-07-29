@@ -9,41 +9,43 @@ import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 
+@Data
 @Entity
 @Table(name = "users")
-@Data
-@AllArgsConstructor
-@RequiredArgsConstructor
-@NoArgsConstructor
 public class User {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+//    @NotBlank(message = "Password can not be blank")
+//    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Password must follow rules")
+//    @Column(nullable = false)
+//    @NonNull
+    private String password;
+
+//    @NotBlank(message = "Username can not be blank")
+//    @Size(max = 50, message = "Username can not be more than 50 characters")
+//    @Column(nullable = false)
+//    @NonNull
+    private String username;
+
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            })
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> roles = new HashSet<>();
 
-    @NotBlank(message = "Password can not be blank")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Password must follow rules")
-    @Column(nullable = false)
-    @NonNull
-    private String password;
-
-    @NotBlank(message = "Username can not be blank")
-    @Size(max = 50, message = "Username can not be more than 50 characters")
-    @Column(nullable = false)
-    @NonNull
-    private String username;
-
-    public User(Set<Role> roles, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
-        this.roles = roles;
-        this.password = password;
-        this.username = username;
-    }
+//    public User(Set<Role> roles, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
+//        this.roles = roles;
+//        this.password = password;
+//        this.username = username;
+//    }
 
 
 }

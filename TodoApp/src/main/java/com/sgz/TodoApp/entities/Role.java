@@ -8,25 +8,30 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "roles")
-@AllArgsConstructor
-@NoArgsConstructor
-@RequiredArgsConstructor
-@Data
+//@AllArgsConstructor
+//@NoArgsConstructor
+//@RequiredArgsConstructor
 public class Role {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank(message = "Please enter a role")
-    @Size(max = 50, message = "Role title cannot be more than 50 characters")
-    @NonNull
-    @Column(nullable = false)
+//    @NotBlank(message = "Please enter a role")
+//    @Size(max = 50, message = "Role title cannot be more than 50 characters")
+//    @NonNull
+//    @Column(nullable = false)
     private String authority;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "roles")
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE
+            },
+            mappedBy = "roles")
     private List<User> users = new ArrayList<>();
 
 }
