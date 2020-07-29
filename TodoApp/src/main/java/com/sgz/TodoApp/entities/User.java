@@ -1,5 +1,6 @@
 package com.sgz.TodoApp.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,40 +13,44 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "users")
+@AllArgsConstructor
+@NoArgsConstructor
+@RequiredArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-//    @NotBlank(message = "Password can not be blank")
-//    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Password must follow rules")
-//    @Column(nullable = false)
-//    @NonNull
+    @NotBlank(message = "Password can not be blank")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$", message = "Password must follow rules")
+    @Column(nullable = false)
+    @NonNull
     private String password;
 
-//    @NotBlank(message = "Username can not be blank")
-//    @Size(max = 50, message = "Username can not be more than 50 characters")
-//    @Column(nullable = false)
-//    @NonNull
+    @NotBlank(message = "Username can not be blank")
+    @Size(max = 50, message = "Username can not be more than 50 characters")
+    @Column(nullable = false)
+    @NonNull
     private String username;
 
 
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
-                    CascadeType.PERSIST,
+//                    CascadeType.PERSIST,
                     CascadeType.MERGE
             })
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    @JsonIgnoreProperties
     private Set<Role> roles = new HashSet<>();
 
-//    public User(Set<Role> roles, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
-//        this.roles = roles;
-//        this.password = password;
-//        this.username = username;
-//    }
+    public User(Set<Role> roles, @NotBlank(message = "Password can not be blank") @NonNull String password, @NotBlank(message = "Username can not be blank") @Size(max = 50, message = "Username can not be more than 50 characters") @NonNull String username) {
+        this.roles = roles;
+        this.password = password;
+        this.username = username;
+    }
 
 
 }

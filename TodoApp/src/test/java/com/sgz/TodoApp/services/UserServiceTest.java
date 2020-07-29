@@ -37,7 +37,7 @@ class UserServiceTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final User expected = new User(1, new HashSet<>(), "", "Sam");
+    private final User expected = new User(1, "", "Sam", new HashSet<>());
 
     private final Set<Role> testRoles = Sets.newHashSet(new Role(1, "USER", null));
 
@@ -57,8 +57,8 @@ class UserServiceTest {
 
     @Test
     void getAll() throws NoItemsException {
-        User expected2 = new User(2, new HashSet<>(), "", "Sam2");
-        User expected3 = new User(3, new HashSet<>(), "", "Sam3");
+        User expected2 = new User(2, "", "Sam2", new HashSet<>());
+        User expected3 = new User(3, "", "Sam3", new HashSet<>());
 
         List<User> fromService = toTest.getAll();
 
@@ -216,7 +216,7 @@ class UserServiceTest {
         User fromService = toTest.getUserById(1);
         assertEquals(expected, fromService);
 
-        User toEdit = new User(1, testRoles, "@amBam21", "Sammy");
+        User toEdit = new User(1, "@amBam21", "Sammy", testRoles);
         fromService = toTest.editUser(toEdit);
 
         assertEquals(toEdit, fromService);
@@ -236,7 +236,7 @@ class UserServiceTest {
 
     @Test
     void editUserEmptyPassword() throws InvalidIdException, InvalidAuthorityException {
-        User toEdit = new User(1, testRoles, "", "Sammy");
+        User toEdit = new User(1, "", "Sammy", testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -246,7 +246,7 @@ class UserServiceTest {
 
     @Test
     void editUserEmptyName() throws InvalidIdException, InvalidAuthorityException {
-        User toEdit = new User(1, testRoles, "@amBam20", "");
+        User toEdit = new User(1, "@amBam20", "", testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -256,7 +256,7 @@ class UserServiceTest {
 
     @Test
     void editUserTooLongPassword() throws InvalidIdException, InvalidAuthorityException {
-        User toEdit = new User(1, testRoles, testLongString, "Sammy");
+        User toEdit = new User(1, testLongString, "Sammy", testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -266,7 +266,7 @@ class UserServiceTest {
 
     @Test
     void editUserTooLongName() throws InvalidIdException, InvalidAuthorityException {
-        User toEdit = new User(1, testRoles, "@amBam20", testLongString);
+        User toEdit = new User(1, "@amBam20", testLongString, testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -276,7 +276,7 @@ class UserServiceTest {
 
     @Test
     void editUserBlankPassword() throws InvalidIdException, InvalidAuthorityException {
-        User toEdit = new User(1, testRoles, "  ", "Sammy");
+        User toEdit = new User(1, "  ", "Sammy", testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -286,7 +286,7 @@ class UserServiceTest {
 
     @Test
     void editUserBlankName() throws InvalidIdException, InvalidAuthorityException {
-        User toEdit = new User(1, testRoles, "@amBam20", "  ");
+        User toEdit = new User(1, "@amBam20", "  ", testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -296,7 +296,7 @@ class UserServiceTest {
 
     @Test
     void editUserInvalidPassword() throws InvalidIdException, InvalidAuthorityException {
-        User toEdit = new User(1, testRoles, "password", "Sammy");
+        User toEdit = new User(1, "password", "Sammy", testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidEntityException");
@@ -306,7 +306,7 @@ class UserServiceTest {
 
     @Test
     void editUserInvalidId() throws InvalidEntityException, InvalidAuthorityException {
-        User toEdit = new User(-1, testRoles, "@amBam20", "Sammy");
+        User toEdit = new User(-1, "@amBam20", "Sammy", testRoles);
         try {
             toTest.editUser(toEdit);
             fail("should hit InvalidIdException");
