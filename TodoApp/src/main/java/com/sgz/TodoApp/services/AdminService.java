@@ -37,7 +37,7 @@ public class AdminService {
 
 
     public User createUser(User toAdd) throws InvalidEntityException, InvalidNameException {
-        validate(toAdd);
+        validateUser(toAdd);
         checkExistsByUsername(toAdd.getUsername());
 
         toAdd.setPassword(passwordEncoder.encode(toAdd.getPassword()));
@@ -66,7 +66,7 @@ public class AdminService {
     }
 
     public User editUser(User toEdit) throws InvalidEntityException, InvalidIdException {
-        validate(toEdit);
+        validateUser(toEdit);
         checkUserExists(toEdit.getId());
 
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
@@ -147,7 +147,7 @@ public class AdminService {
         }
     }
 
-    private void validate(User toUpsert) throws InvalidEntityException {
+    private void validateUser(User toUpsert) throws InvalidEntityException {
         if (toUpsert == null
                 || toUpsert.getUsername().trim().isEmpty()
                 || toUpsert.getUsername().trim().length() > 50
