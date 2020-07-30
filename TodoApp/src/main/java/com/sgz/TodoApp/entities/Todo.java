@@ -60,4 +60,12 @@ public class Todo {
     @JoinColumn(name = "user_id")
     private User user = new User();
 
+    public Todo(int id, String name, String description, LocalDate startDate, LocalDate endDate, boolean finished) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.finished = finished;
+    }
 }
