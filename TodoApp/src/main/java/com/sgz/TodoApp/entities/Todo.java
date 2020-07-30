@@ -5,34 +5,25 @@
  */
 package com.sgz.TodoApp.entities;
 
-import java.time.LocalDate;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
+import javax.validation.constraints.*;
+import java.time.LocalDate;
 
 /**
  *
  * @author samg.zun
  */
+@JsonIgnoreProperties("user")
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
 @ToString
-@Entity(name = "Todos")
+@Entity
+@Table(name = "Todos")
 @Data
 public class Todo {
 
@@ -64,5 +55,9 @@ public class Todo {
 
     @Column(nullable = false)
     private boolean finished;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user = new User();
 
 }

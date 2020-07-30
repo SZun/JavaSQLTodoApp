@@ -1,0 +1,3 @@
+USE TodoDB;
+
+SELECT * FROM Users;
