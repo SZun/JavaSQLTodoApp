@@ -60,16 +60,15 @@ public class UserService {
         return toGet.get();
     }
 
-    public User editUser(User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
+    public User editUser(User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException, InvalidNameException {
         validate(toEdit);
         checkExists(toEdit.getId());
+        checkExistsByUsername(toEdit.getUsername());
 
         toEdit.setRoles(Sets.newHashSet(getRoleByAuthority("USER")));
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
 
-        User toReturn = userRepo.save(toEdit);
-
-        return toReturn;
+        return userRepo.save(toEdit);
     }
 
     public User getUserById(int id) throws InvalidIdException {
@@ -81,7 +80,7 @@ public class UserService {
         return toGet.get();
     }
 
-    public void deleteUserById(int id) throws InvalidIdException {
+    public void deleteUserById(int id) throws InvalidIdException, InvalidNameException, InvalidEntityException {
         checkExists(id);
         userRepo.deleteById(id);
     }
@@ -105,8 +104,8 @@ public class UserService {
         }
     }
 
-    private void checkExists(int id) throws InvalidIdException {
-        if (!userRepo.existsById(id)) {
+    private void checkExists(int id) throws InvalidIdException, InvalidNameException, InvalidEntityException {
+        if (id != getUserByName(getAuthName()).getId() || !userRepo.existsById(id)) {
             throw new InvalidIdException("Invalid Id");
         }
     }

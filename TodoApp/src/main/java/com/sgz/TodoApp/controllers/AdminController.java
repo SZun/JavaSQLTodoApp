@@ -85,7 +85,7 @@ public class AdminController {
     }
     @PutMapping("roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> editRole(@PathVariable int id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
+    public ResponseEntity<Role> editRole(@PathVariable int id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
         try {
             Role toCheck = service.getRoleByAuthority(toEdit.getAuthority());
             if(toCheck.getId() != id){
@@ -95,11 +95,18 @@ public class AdminController {
 
         return ResponseEntity.ok(service.editRole(toEdit));
     }
+
     @DeleteMapping("roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Integer> deleteRoleById(@PathVariable int id) throws InvalidIdException {
         service.deleteRoleById(id);
         return new ResponseEntity(id, HttpStatus.OK);
+    }
+
+    @PutMapping("roles/users/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Role> updateRolesUsers(@PathVariable int id, @Valid @RequestBody List<User> users) throws InvalidEntityException, InvalidIdException {
+        return ResponseEntity.ok(service.updateRolesUsers(id, users));
     }
 
 }

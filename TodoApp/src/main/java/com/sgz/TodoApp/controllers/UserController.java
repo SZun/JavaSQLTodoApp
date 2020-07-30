@@ -6,7 +6,6 @@ import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +39,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<User> updateUserById(@PathVariable int id, @Valid @RequestBody User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
+    public ResponseEntity<User> updateUserById(@PathVariable int id, @Valid @RequestBody User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException, InvalidNameException {
 
         try {
             User toCheck = service.getUserByName(toEdit.getUsername());
@@ -55,7 +54,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<User> deleteUserById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<User> deleteUserById(@PathVariable int id) throws InvalidIdException, InvalidEntityException, InvalidNameException {
         service.deleteUserById(id);
         return new ResponseEntity(HttpStatus.OK);
     }

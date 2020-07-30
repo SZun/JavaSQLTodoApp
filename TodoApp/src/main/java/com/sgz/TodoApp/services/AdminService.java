@@ -27,12 +27,19 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public Role updateRolesUsers(int id, List<User> users) throws InvalidEntityException, InvalidIdException {
+        for(User u : users) validateUser(u);
+        Role toEdit = getRoleById(id);
+
+        toEdit.setUsers(users);
+        return roleRepo.save(toEdit);
+    }
+
     public User updateUserRole(int id, Set<Role> roles) throws InvalidEntityException, InvalidIdException {
         for(Role r : roles) validateRole(r);
         User toEdit = getUserById(id);
 
         toEdit.setRoles(roles);
-        System.out.println(id);
         return userRepo.save(toEdit);
     }
 
