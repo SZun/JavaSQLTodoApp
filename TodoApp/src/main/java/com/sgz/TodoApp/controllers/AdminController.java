@@ -7,7 +7,7 @@ import com.sgz.TodoApp.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -16,33 +16,37 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/admin/")
-@Secured("ROLE_ADMIN")
 public class AdminController {
 
     @Autowired
     private AdminService service;
 
     @GetMapping("users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> getAllUsers() throws NoItemsException {
         return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("users/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> getUserById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(service.getUserById(id));
     }
 
     @PostMapping("users")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> createUser(@Valid @RequestBody User toAdd) throws InvalidEntityException, InvalidNameException {
         return new ResponseEntity(service.createUser(toAdd), HttpStatus.CREATED);
     }
 
     @PutMapping("users/{id}/roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> editUserRoles(@PathVariable int id, @RequestBody Set<Role> roles) throws InvalidEntityException, InvalidIdException {
         return new ResponseEntity(service.updateUserRole(id,roles), HttpStatus.OK);
     }
 
     @PutMapping("users/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> updateUserById(@PathVariable int id, @Valid @RequestBody User toEdit) throws InvalidEntityException, InvalidIdException {
 
         try {
@@ -57,6 +61,7 @@ public class AdminController {
     }
 
     @DeleteMapping("users/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Integer> deleteUserById(@PathVariable int id) throws InvalidIdException {
         service.deleteUserById(id);
         return new ResponseEntity(id, HttpStatus.OK);
@@ -68,15 +73,18 @@ public class AdminController {
     }
 
     @GetMapping("roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> getAllRoleById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(service.getRoleById(id));
     }
 
     @PostMapping("roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> createRole(@Valid @RequestBody Role toAdd) throws InvalidEntityException, InvalidAuthorityException {
         return ResponseEntity.ok(service.createRole(toAdd));
     }
     @PutMapping("roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> editRole(@PathVariable int id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException {
         try {
             Role toCheck = service.getRoleByAuthority(toEdit.getAuthority());
@@ -88,6 +96,7 @@ public class AdminController {
         return ResponseEntity.ok(service.editRole(toEdit));
     }
     @DeleteMapping("roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Integer> deleteRoleById(@PathVariable int id) throws InvalidIdException {
         service.deleteRoleById(id);
         return new ResponseEntity(id, HttpStatus.OK);
