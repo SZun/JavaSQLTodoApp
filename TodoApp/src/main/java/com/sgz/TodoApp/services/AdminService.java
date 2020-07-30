@@ -1,7 +1,7 @@
 package com.sgz.TodoApp.services;
 
-import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.entities.Role;
+import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.repos.RoleRepo;
 import com.sgz.TodoApp.repos.UserRepo;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class AdminService {
@@ -26,12 +27,12 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User updateUserRole(User toEdit) throws InvalidEntityException, InvalidIdException {
-        if (toEdit == null) throw new InvalidEntityException("Invalid entity");
+    public User updateUserRole(int id, Set<Role> roles) throws InvalidEntityException, InvalidIdException {
+        for(Role r : roles) validateRole(r);
+        User toEdit = getUserById(id);
 
-        checkUserExists(toEdit.getId());
-        validateEditRole(toEdit, userRepo.findById(toEdit.getId()).get());
-
+        toEdit.setRoles(roles);
+        System.out.println(id);
         return userRepo.save(toEdit);
     }
 
@@ -133,18 +134,6 @@ public class AdminService {
     public void deleteRoleById(int id) throws InvalidIdException {
         checkRoleExists(id);
         roleRepo.deleteById(id);
-    }
-
-    private void validateEditRole(User toEdit, User original) throws InvalidEntityException {
-        if (original == null
-                || toEdit.getRoles() == null
-                || toEdit.getRoles().isEmpty()
-                || original.getId() != toEdit.getId()
-                || !original.getUsername().equals(toEdit.getUsername())
-                || !original.getPassword().equals(toEdit.getPassword())
-        ) {
-            throw new InvalidEntityException("Invalid Entity");
-        }
     }
 
     private void validateUser(User toUpsert) throws InvalidEntityException {
