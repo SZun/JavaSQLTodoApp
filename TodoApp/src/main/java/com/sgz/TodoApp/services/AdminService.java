@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class AdminService {
@@ -27,19 +25,27 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Role updateRolesUsers(int id, List<User> users) throws InvalidEntityException, InvalidIdException {
-        for(User u : users) validateUser(u);
-        Role toEdit = getRoleById(id);
+    public Role updateRolesUsers(int id, List<Integer> userIds) throws InvalidIdException {
+        List<User> users = new ArrayList<>();
+        for(Integer userId: userIds) {
+            users.add(getUserById(userId));
+        }
 
+        Role toEdit = getRoleById(id);
         toEdit.setUsers(users);
+
         return roleRepo.save(toEdit);
     }
 
-    public User updateUserRole(int id, Set<Role> roles) throws InvalidEntityException, InvalidIdException {
-        for(Role r : roles) validateRole(r);
-        User toEdit = getUserById(id);
+    public User updateUserRole(int id, Set<Integer> roleIds) throws InvalidIdException {
+        Set<Role> userRoles = new HashSet<>();
+        for(Integer roleId : roleIds) {
+            userRoles.add(getRoleById(roleId));
+        }
 
-        toEdit.setRoles(roles);
+        User toEdit = getUserById(id);
+        toEdit.setRoles(userRoles);
+
         return userRepo.save(toEdit);
     }
 
