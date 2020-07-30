@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author samg.zun
  */
+//test comment
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TestAppConfig.class)
 public class TodoServiceTest {
