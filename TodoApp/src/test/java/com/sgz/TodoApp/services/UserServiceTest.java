@@ -16,6 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.nio.file.AccessDeniedException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -31,162 +39,258 @@ class UserServiceTest {
 
     private final User testUser = new User(1, "@amBam20", "Sam");
 
-    private final Role testRole = new Role(1, "USER");
+    private final Set<Role>  testRoles = Sets.newHashSet(Sets.newHashSet(new Role(1, "USER")));
 
-    private final User expectedUser = new User(1, "@amBam20", "Sam", Sets.newHashSet(this.testRole));
+    private final User expectedUser = new User(1, "@amBam20", "Sam", this.testRoles);
 
     private final String testLongString = "1ZvBWFVdBu62e6yT87rdELXaLP6KfY2wJ9ZRpw9KmZqzNFICvlNKgkCU28aKRpQb2I85EqAxr6Xb4A1Ct4yNEjTOAXgNyyIBEyTnjOYyN4piLPot1OYtnNftyVXZg6DSxlAGgYzBa5ATYzkSHo2EmIpNyc0NCXvFtPdwP1N30s1Fn63sBaQGdX8sZffYO29yTVtg4LLYRdrrP8aPmL2Pm3c3XySoA7KLLNIi8417yXnjzgdDQErkKiAuoR5REsdL";
 
     @Test
     void createUser() throws InvalidEntityException, InvalidNameException {
-    }
+        final User toCreate = new User("@amBam20", "Sam", testRoles);
 
-    @Test
-    void createUserInvalidName() {
+        when(passwordEncoder.encode(anyString())).thenReturn(toCreate.getPassword());
+        when(userRepo.save(any())).thenReturn(testUser);
+
+        User fromService = toTest.createUser(toCreate);
+
+        assertEquals(testUser, fromService);
     }
 
     @Test
     void createUserNullUser() {
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(null));
     }
 
     @Test
-    void createUserBlankName() {
+    void createUserEmptyUsername() {
+        final User toCreate = new User("@amBam20", "", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
-    void createUserEmptyName() {
+    void createUserBlankUsername() {
+        final User toCreate = new User("@amBam20", "   ", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
-    void createUserTooLongName() {
+    void createUserTooLongUsername() {
+        final User toCreate = new User("@amBam20", testLongString, testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
-    void createUserBlankPassword() {
+    void createUserInvalidUsername() {
+        final User toCreate = new User("@amBam20", "Sam", testRoles);
+
+        when(userRepo.existsByUsername(anyString())).thenReturn(true);
+
+        assertThrows(InvalidNameException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserEmptyPassword() {
+        final User toCreate = new User("", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
+    }
+
+    @Test
+    void createUserBlankPassword() {
+        final User toCreate = new User("  ", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserTooLongPassword() {
+        final User toCreate = new User(testLongString, "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserInvalidPassword() {
+        final User toCreate = new User("password", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
-    void createUserNullRole() {
+    void createUserNullRoles() {
+        final User toCreate = new User("password", "Sam", null);
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserEmptyRoles() {
+        final User toCreate = new User("password", "Sam", Sets.newHashSet());
+        assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void getAllUsers() throws NoItemsException {
+        final User expected2 = new User(1, "@amBam22", "Sam2", testRoles);
+        final User expected3 = new User(1, "@amBam23", "Sam3", testRoles);
+
+        when(userRepo.findAll()).thenReturn(Arrays.asList(expectedUser, expected2, expected3));
+
+        List<User> fromService = toTest.getAllUsers();
+
+        assertEquals(3, fromService.size());
+        assertTrue(fromService.contains(expectedUser));
+        assertTrue(fromService.contains(expected2));
+        assertTrue(fromService.contains(expected3));
     }
 
     @Test
     void getAllUsersNoItems() {
+        assertThrows(NoItemsException.class, () -> toTest.getAllUsers());
     }
 
     @Test
     void getUserByName() throws InvalidEntityException, InvalidNameException {
+        when(userRepo.findByUsername(anyString())).thenReturn(Optional.of(expectedUser));
+
+        User fromService = toTest.getUserByName("Sam");
+
+        assertEquals(expectedUser, fromService);
     }
 
     @Test
-    void getUserByNameNullName() {
+    void getUserNullName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getUserByName(null));
     }
 
     @Test
-    void getUserByNameBlankName() {
+    void getUserEmptyName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getUserByName(""));
     }
 
     @Test
-    void getUserByNameEmptyName() {
+    void getUserBlankName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getUserByName("  "));
     }
 
     @Test
-    void getUserByNameInvalidName() {
+    void getUserTooLongName() {
+        assertThrows(InvalidEntityException.class, () -> toTest.getUserByName(testLongString));
     }
 
     @Test
-    void editUser() throws InvalidEntityException, InvalidIdException, InvalidNameException, AccessDeniedException {
+    void getUserInvalidName() {
+        assertThrows(InvalidNameException.class, () -> toTest.getUserByName("username"));
     }
 
     @Test
-    void editUserInvalidName() {
+    void editUser() throws InvalidEntityException, InvalidIdException, AccessDeniedException {
+        final User toEdit = new User(1, "@amBam25", "Test_User", testRoles);
+
+        when(userRepo.existsById(anyInt())).thenReturn(true);
+        when(passwordEncoder.encode(anyString())).thenReturn(toEdit.getPassword());
+        when(userRepo.save(any())).thenReturn(testUser);
+
+        User fromService = toTest.editUser(toEdit, 1);
+
+        assertEquals(testUser, fromService);
     }
 
     @Test
     void editUserNullUser() {
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(null,1));
     }
 
     @Test
-    void editUserBlankName() {
+    void editUserEmptyUsername() {
+        final User toEdit = new User(1, "@amBam25", "", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
-    void editUserEmptyName() {
+    void editUserBlankUsername() {
+        final User toEdit = new User(1, "@amBam25", "   ", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
-    void editUserTooLongName() {
-    }
-
-    @Test
-    void editUserBlankPassword() {
+    void editUserTooLongUsername() {
+        final User toEdit = new User(1, "@amBam25", testLongString, testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
     void editUserEmptyPassword() {
+        final User toEdit = new User(1, "", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+    }
+
+    @Test
+    void editUserBlankPassword() {
+        final User toEdit = new User(1, "  ", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
     void editUserTooLongPassword() {
+        final User toEdit = new User(1, testLongString, "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
     void editUserInvalidPassword() {
+        final User toEdit = new User(1, "password", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
-    void editUserNullRole() {
+    void editUserInvalidId() {
+        final User toEdit = new User(1, "@amBam20", "Sam", testRoles);
+        assertThrows(InvalidIdException.class, () -> toTest.editUser(toEdit, 1));
+    }
+
+    @Test
+    void editUserNullRoles() {
+        final User toEdit = new User(1, "@amBam20", "Sam", null);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
     void editUserEmptyRoles() {
+        final User toEdit = new User(1, "@amBam20", "Sam", Sets.newHashSet());
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
     }
 
     @Test
-    void editUserUnauthorized() {
-    }
-
-    @Test
-    void editUserNonExistent() {
+    void editUserAccessDenied() {
+        final User toEdit = new User(1, "@amBam20", "Sam", testRoles);
+        assertThrows(AccessDeniedException.class, () -> toTest.editUser(toEdit, 2));
     }
 
     @Test
     void getUserById() throws InvalidIdException {
+        when(userRepo.findById(anyInt())).thenReturn(Optional.of(expectedUser));
+
+        User fromService = toTest.getUserById(1);
+
+        assertEquals(expectedUser, fromService);
     }
 
     @Test
     void getUserByIdInvalidId() {
+        assertThrows(InvalidIdException.class, () -> toTest.getUserById(1));
     }
 
     @Test
     void deleteUserById() throws InvalidIdException, AccessDeniedException {
+        when(userRepo.existsById(anyInt())).thenReturn(true);
+
+        toTest.deleteUserById(1,1);
     }
 
     @Test
     void deleteUserByIdInvalidId() {
-
+        assertThrows(InvalidIdException.class, () -> toTest.deleteUserById(1,1));
     }
 
     @Test
-    void deleteUserByIdUnauthorized() {
+    void deleteUserByIdAccessDenied() {
+        assertThrows(AccessDeniedException.class, () -> toTest.deleteUserById(1,2));
     }
 }

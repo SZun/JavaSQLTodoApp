@@ -43,7 +43,9 @@ public class UserService {
     }
 
     public User getUserByName(String username) throws InvalidEntityException, InvalidNameException {
-        if (username == null || username.trim().isEmpty()) {
+        if (username == null
+                || username.trim().isEmpty()
+                || username.trim().length() > 50) {
             throw new InvalidEntityException("Name is invalid");
         }
 
@@ -56,8 +58,8 @@ public class UserService {
     }
 
     public User editUser(User toEdit, int authId) throws InvalidEntityException, InvalidIdException, AccessDeniedException {
-        checkAuthorization(toEdit.getId(), authId);
         validate(toEdit);
+        checkAuthorization(toEdit.getId(), authId);
         checkExists(toEdit.getId());
 
         toEdit.setPassword(passwordEncoder.encode(toEdit.getPassword()));
