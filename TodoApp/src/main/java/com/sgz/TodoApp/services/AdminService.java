@@ -35,8 +35,6 @@ public class AdminService {
                 || toEdit.getUsername().trim().isEmpty()
                 || toEdit.getUsername().trim().length() > 50
                 || toEdit.getPassword().trim().isEmpty()
-                || toEdit.getPassword().trim().length() > 20
-                || !toEdit.getPassword().matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")
                 || toEdit.getRoles() == null
                 || toEdit.getRoles().isEmpty()
         ) {
