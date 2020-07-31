@@ -7,10 +7,10 @@ import com.sgz.TodoApp.exceptions.*;
 import com.sgz.TodoApp.repos.RoleRepo;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +60,8 @@ public class UserService {
         return toGet.get();
     }
 
-    public User editUser(User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException, InvalidNameException {
+    public User editUser(User toEdit, int authId) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException, InvalidNameException, AccessDeniedException {
+        isAuthoritzed(toEdit.getId(), authId);
         validate(toEdit);
         checkExists(toEdit.getId());
         checkExistsByUsername(toEdit.getUsername());
@@ -80,9 +81,10 @@ public class UserService {
         return toGet.get();
     }
 
-    public void deleteUserById(int id) throws InvalidIdException, InvalidNameException, InvalidEntityException {
-        checkExists(id);
-        userRepo.deleteById(id);
+    public void deleteUserById(int writeId, int authId) throws InvalidIdException, InvalidNameException, InvalidEntityException, AccessDeniedException {
+        isAuthoritzed(writeId, authId);
+        checkExists(writeId);
+        userRepo.deleteById(writeId);
     }
 
     private Role getRoleByAuthority(String authority) throws InvalidAuthorityException, InvalidEntityException {
@@ -105,9 +107,13 @@ public class UserService {
     }
 
     private void checkExists(int id) throws InvalidIdException, InvalidNameException, InvalidEntityException {
-        if (id != getUserByName(getAuthName()).getId() || !userRepo.existsById(id)) {
+        if (!userRepo.existsById(id)) {
             throw new InvalidIdException("Invalid Id");
         }
+    }
+
+    private void isAuthoritzed(int writeId, int authId) throws AccessDeniedException {
+        if(writeId != authId) throw new AccessDeniedException("Access Denied");
     }
 
     private void validate(User toUpsert) throws InvalidEntityException {
@@ -120,10 +126,6 @@ public class UserService {
         ) {
             throw new InvalidEntityException("Invalid Entity");
         }
-    }
-
-    private String getAuthName() {
-        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
 }
