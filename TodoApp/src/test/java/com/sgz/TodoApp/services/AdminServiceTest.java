@@ -94,7 +94,7 @@ class AdminServiceTest {
 
     @Test
     void createUser() throws InvalidEntityException, InvalidNameException {
-        User toCreate = new User("@amBam20", "Sam");
+        final User toCreate = new User("@amBam20", "Sam");
 
         when(passwordEncoder.encode(anyString())).thenReturn(toCreate.getPassword());
         when(userRepo.save(toCreate)).thenReturn(testUser);
@@ -111,25 +111,25 @@ class AdminServiceTest {
 
     @Test
     void createUserEmptyUsername() {
-        User toCreate = new User("@amBam20", "");
+        final User toCreate = new User("@amBam20", "");
         assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserBlankUsername() {
-        User toCreate = new User("@amBam20", "   ");
+        final User toCreate = new User("@amBam20", "   ");
         assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserTooLongUsername() {
-        User toCreate = new User("@amBam20", testLongString);
+        final User toCreate = new User("@amBam20", testLongString);
         assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserInvalidUsername() {
-        User toCreate = new User("@amBam20", "Sam");
+        final User toCreate = new User("@amBam20", "Sam");
 
         when(userRepo.existsByUsername(anyString())).thenReturn(true);
 
@@ -138,32 +138,32 @@ class AdminServiceTest {
 
     @Test
     void createUserEmptyPassword() {
-        User toCreate = new User("", "Sam");
+        final User toCreate = new User("", "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserBlankPassword() {
-        User toCreate = new User("  ", "Sam");
+        final User toCreate = new User("  ", "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserTooLongPassword() {
-        User toCreate = new User(testLongString, "Sam");
+        final User toCreate = new User(testLongString, "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void createUserInvalidPassword() {
-        User toCreate = new User("password", "Sam");
+        final User toCreate = new User("password", "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.createUser(toCreate));
     }
 
     @Test
     void getAllUsers() throws NoItemsException {
-        User expected2 = new User(1, "@amBam22", "Sam2", Sets.newHashSet(testRole));
-        User expected3 = new User(1, "@amBam23", "Sam3", Sets.newHashSet(testRole));
+        final User expected2 = new User(1, "@amBam22", "Sam2", Sets.newHashSet(testRole));
+        final User expected3 = new User(1, "@amBam23", "Sam3", Sets.newHashSet(testRole));
 
         when(userRepo.findAll()).thenReturn(Arrays.asList(expectedUser, expected2, expected3));
 
@@ -216,7 +216,7 @@ class AdminServiceTest {
 
     @Test
     void editUser() throws InvalidEntityException, InvalidIdException {
-        User toEdit = new User(1, "@amBam25", "Test_User");
+        final User toEdit = new User(1, "@amBam25", "Test_User");
 
         when(userRepo.existsById(anyInt())).thenReturn(true);
         when(passwordEncoder.encode(anyString())).thenReturn(toEdit.getPassword());
@@ -234,49 +234,49 @@ class AdminServiceTest {
 
     @Test
     void editUserEmptyUsername() {
-        User toEdit = new User(1, "@amBam25", "");
+        final User toEdit = new User(1, "@amBam25", "");
         assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit));
     }
 
     @Test
     void editUserBlankUsername() {
-        User toEdit = new User(1, "@amBam25", "   ");
+        final User toEdit = new User(1, "@amBam25", "   ");
         assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit));
     }
 
     @Test
     void editUserTooLongUsername() {
-        User toEdit = new User(1, "@amBam25", testLongString);
+        final User toEdit = new User(1, "@amBam25", testLongString);
         assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit));
     }
 
     @Test
     void editUserEmptyPassword() {
-        User toEdit = new User(1, "", "Sam");
+        final User toEdit = new User(1, "", "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit));
     }
 
     @Test
     void editUserBlankPassword() {
-        User toEdit = new User(1, "  ", "Sam");
+        final User toEdit = new User(1, "  ", "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit));
     }
 
     @Test
     void editUserTooLongPassword() {
-        User toEdit = new User(1, testLongString, "Sam");
+        final User toEdit = new User(1, testLongString, "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit));
     }
 
     @Test
     void editUserInvalidPassword() {
-        User toEdit = new User(1, "password", "Sam");
+        final User toEdit = new User(1, "password", "Sam");
         assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit));
     }
 
     @Test
     void editUserInvalidId() {
-        User toEdit = new User(1, "@amBam20", "Sam");
+        final User toEdit = new User(1, "@amBam20", "Sam");
         assertThrows(InvalidIdException.class, () -> toTest.editUser(toEdit));
     }
 
@@ -308,8 +308,8 @@ class AdminServiceTest {
 
     @Test
     void getAllRoles() throws NoItemsException {
-        Role expected2 = new Role(2, "ADMIN", Arrays.asList(testUser));
-        Role expected3 = new Role(3, "GUEST", Arrays.asList(testUser));
+        final Role expected2 = new Role(2, "ADMIN", Arrays.asList(testUser));
+        final Role expected3 = new Role(3, "GUEST", Arrays.asList(testUser));
 
         when(roleRepo.findAll()).thenReturn(Arrays.asList(expectedRole, expected2, expected3));
 
@@ -376,7 +376,7 @@ class AdminServiceTest {
 
     @Test
     void createRole() throws InvalidEntityException, InvalidAuthorityException {
-        Role toCreate = new Role("USER");
+        final Role toCreate = new Role("USER");
 
         when(roleRepo.save(toCreate)).thenReturn(testRole);
 
@@ -392,25 +392,25 @@ class AdminServiceTest {
 
     @Test
     void createRoleEmptyAuthority() {
-        Role toCreate = new Role("");
+        final Role toCreate = new Role("");
         assertThrows(InvalidEntityException.class, () -> toTest.createRole(toCreate));
     }
 
     @Test
     void createRoleBlankAuthority()  {
-        Role toCreate = new Role("  ");
+        final Role toCreate = new Role("  ");
         assertThrows(InvalidEntityException.class, () -> toTest.createRole(toCreate));
     }
 
     @Test
     void createRoleTooLongAuthority()  {
-        Role toCreate = new Role(testLongString);
+        final Role toCreate = new Role(testLongString);
         assertThrows(InvalidEntityException.class, () -> toTest.createRole(toCreate));
     }
 
     @Test
     void createRoleInvalidAuthority() throws InvalidEntityException {
-        Role toCreate = new Role("USER");
+        final Role toCreate = new Role("USER");
 
         when(roleRepo.existsByAuthority(anyString())).thenReturn(true);
 
@@ -434,25 +434,25 @@ class AdminServiceTest {
 
     @Test
     void editRoleEmptyAuthority()  {
-        Role toEdit = new Role(1, "");
+        final Role toEdit = new Role(1, "");
         assertThrows(InvalidEntityException.class, () -> toTest.editRole(toEdit));
     }
 
     @Test
     void editRoleBlankAuthority()  {
-        Role toEdit = new Role(1, "  ");
+        final Role toEdit = new Role(1, "  ");
         assertThrows(InvalidEntityException.class, () -> toTest.editRole(toEdit));
     }
 
     @Test
     void editRoleTooLongAuthority()  {
-        Role toEdit = new Role(1, testLongString);
+        final Role toEdit = new Role(1, testLongString);
         assertThrows(InvalidEntityException.class, () -> toTest.editRole(toEdit));
     }
 
     @Test
     void editRoleInvalidId() {
-        Role toEdit = new Role(1, "USER");
+        final Role toEdit = new Role(1, "USER");
         assertThrows(InvalidIdException.class, () -> toTest.editRole(toEdit));
     }
 
