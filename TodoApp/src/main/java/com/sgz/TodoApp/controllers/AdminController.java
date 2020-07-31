@@ -24,7 +24,7 @@ public class AdminController {
     @GetMapping("users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<User>> getAllUsers() throws NoItemsException {
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(service.getAllUsers());
     }
 
     @GetMapping("users/{id}")
@@ -42,7 +42,7 @@ public class AdminController {
     @PutMapping("users/{id}/roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<User> editUserRoles(@PathVariable int id, @RequestBody Set<Integer> roleIds) throws InvalidIdException {
-        return new ResponseEntity(service.updateUserRole(id, roleIds), HttpStatus.OK);
+        return new ResponseEntity(service.updateUserRoles(id, roleIds), HttpStatus.OK);
     }
 
     @PutMapping("users/{id}")
@@ -106,7 +106,7 @@ public class AdminController {
     @PutMapping("roles/users/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> updateRolesUsers(@PathVariable int id, @RequestBody List<Integer> userIds) throws InvalidIdException {
-        return ResponseEntity.ok(service.updateRolesUsers(id, userIds));
+        return ResponseEntity.ok(service.updateRoleUsers(id, userIds));
     }
 
 }

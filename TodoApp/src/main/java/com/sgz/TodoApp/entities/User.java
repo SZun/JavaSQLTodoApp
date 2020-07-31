@@ -42,12 +42,6 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "role_id")})
     private Set<Role> roles = new HashSet<>();
 
-    public User(Set<Role> roles, String password, String username) {
-        this.roles = roles;
-        this.password = password;
-        this.username = username;
-    }
-
     public User(int id, String password, String username) {
         this.id = id;
         this.password = password;

@@ -25,7 +25,7 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Role updateRolesUsers(int id, List<Integer> userIds) throws InvalidIdException {
+    public Role updateRoleUsers(int id, List<Integer> userIds) throws InvalidIdException {
         List<User> users = new ArrayList<>();
         for(Integer userId: userIds) {
             users.add(getUserById(userId));
@@ -37,7 +37,7 @@ public class AdminService {
         return roleRepo.save(toEdit);
     }
 
-    public User updateUserRole(int id, Set<Integer> roleIds) throws InvalidIdException {
+    public User updateUserRoles(int id, Set<Integer> roleIds) throws InvalidIdException {
         Set<Role> userRoles = new HashSet<>();
         for(Integer roleId : roleIds) {
             userRoles.add(getRoleById(roleId));
@@ -59,7 +59,7 @@ public class AdminService {
         return userRepo.save(toAdd);
     }
 
-    public List<User> getAll() throws NoItemsException {
+    public List<User> getAllUsers() throws NoItemsException {
         List<User> allUsers = userRepo.findAll();
         if (allUsers.isEmpty()) {
             throw new NoItemsException("No Items");
@@ -68,7 +68,9 @@ public class AdminService {
     }
 
     public User getUserByName(String username) throws InvalidEntityException, InvalidNameException {
-        if (username == null || username.trim().isEmpty()) {
+        if (username == null
+                || username.trim().isEmpty()
+                || username.trim().length() > 50) {
             throw new InvalidEntityException("Name is invalid");
         }
 
@@ -118,7 +120,9 @@ public class AdminService {
     }
 
     public Role getRoleByAuthority(String authority) throws InvalidAuthorityException, InvalidEntityException {
-        if (authority == null || authority.trim().isEmpty()) {
+        if (authority == null
+                || authority.trim().isEmpty()
+                || authority.trim().length() > 50) {
             throw new InvalidEntityException("Name is invalid");
         }
 

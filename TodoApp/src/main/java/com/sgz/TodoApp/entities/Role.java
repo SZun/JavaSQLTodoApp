@@ -31,4 +31,8 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private List<User> users = new ArrayList<>();
 
+    public Role(int id, String authority) {
+        this.id = id;
+        this.authority = authority;
+    }
 }
