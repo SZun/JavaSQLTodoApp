@@ -2,8 +2,10 @@ package com.sgz.TodoApp.controllers;
 
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.User;
+import com.sgz.TodoApp.exceptions.InvalidAuthorityException;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.services.AdminService;
 import com.sgz.TodoApp.services.RoleService;
 import com.sgz.TodoApp.services.UserService;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +54,42 @@ public class AdminController {
             users.add(userService.getUserById(userId));
         }
         return ResponseEntity.ok(adminService.updateRoleUsers(toEdit));
+    }
+
+    @GetMapping("roles")
+    public ResponseEntity<List<Role>> getAllRoles() throws NoItemsException {
+        return ResponseEntity.ok(roleService.getAllRoles());
+    }
+
+    @GetMapping("roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Role> getAllRoleById(@PathVariable int id) throws InvalidIdException {
+        return ResponseEntity.ok(roleService.getRoleById(id));
+    }
+
+    @PostMapping("roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Role> createRole(@Valid @RequestBody Role toAdd) throws InvalidEntityException, InvalidAuthorityException {
+        return ResponseEntity.ok(roleService.createRole(toAdd));
+    }
+    @PutMapping("roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Role> editRole(@PathVariable int id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
+        try {
+            Role toCheck = roleService.getRoleByAuthority(toEdit.getAuthority());
+            if(toCheck.getId() != id){
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            }
+        } catch(InvalidAuthorityException | InvalidEntityException ex){}
+
+        return ResponseEntity.ok(roleService.editRole(toEdit));
+    }
+
+    @DeleteMapping("roles/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Integer> deleteRoleById(@PathVariable int id) throws InvalidIdException {
+        roleService.deleteRoleById(id);
+        return new ResponseEntity(id, HttpStatus.OK);
     }
 
 }
