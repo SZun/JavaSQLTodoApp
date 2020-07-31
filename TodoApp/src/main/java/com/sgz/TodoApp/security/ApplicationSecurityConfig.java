@@ -18,8 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKey;
 
-//import static com.sgz.TodoApp.security.ApplicationUserRole.STUDENT;
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -48,8 +46,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), config, secretKey))
                 .addFilterAfter(new JwtTokenVerifier(secretKey, config), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/", baseURL + "/users/create", "index", "/css/*", "/js/*").permitAll()
-//                .antMatchers("/api/**").hasRole(STUDENT.name())
+                .antMatchers("/", baseURL + "/users/create", "/index", "/css/*", "/js/*").permitAll()
                 .anyRequest()
                 .authenticated();
 

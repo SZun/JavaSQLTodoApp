@@ -1,10 +1,10 @@
 package com.sgz.TodoApp.controllers;
 
-import com.sgz.TodoApp.entities.ApplicationUser;
-import com.sgz.TodoApp.exceptions.InvalidEntityException;
-import com.sgz.TodoApp.exceptions.InvalidIdException;
-import com.sgz.TodoApp.exceptions.InvalidNameException;
-import com.sgz.TodoApp.exceptions.NoItemsException;
+import com.google.common.collect.Sets;
+import com.sgz.TodoApp.entities.User;
+import com.sgz.TodoApp.exceptions.*;
+import com.sgz.TodoApp.services.AuthService;
+import com.sgz.TodoApp.services.RoleService;
 import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -20,44 +21,54 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    UserService service;
+    private UserService userService;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/create")
-    public ResponseEntity<ApplicationUser> createUser(@Valid @RequestBody ApplicationUser toAdd) throws InvalidEntityException, InvalidNameException {
-        return new ResponseEntity(service.createUser(toAdd), HttpStatus.CREATED);
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<User> createUser(@Valid @RequestBody User toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
+        toAdd.setRoles(Sets.newHashSet(roleService.getRoleByAuthority("USER")));
+        return new ResponseEntity(userService.createUser(toAdd), HttpStatus.CREATED);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<List<ApplicationUser>> getAllUsers() throws NoItemsException {
-        return ResponseEntity.ok(service.getAll());
+    public ResponseEntity<List<User>> getAllUsers() throws NoItemsException {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApplicationUser> getUserById(@PathVariable int id) throws InvalidIdException {
-        return ResponseEntity.ok(service.getUserById(id));
+    public ResponseEntity<User> getUserById(@PathVariable int id) throws InvalidIdException {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApplicationUser> updateUserById(@PathVariable int id, @Valid @RequestBody ApplicationUser toEdit) throws InvalidEntityException, InvalidIdException {
-
+    public ResponseEntity<User> updateUserById(@PathVariable int id, @Valid @RequestBody User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException, InvalidNameException, AccessDeniedException {
         try {
-            ApplicationUser toCheck = service.getUserByName(toEdit.getUsername());
-            if(toCheck.getId() != id){
+            User toCheck = userService.getUserByName(toEdit.getUsername());
+
+            if (toCheck.getId() != authService.getUserId()) {
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
-        } catch(InvalidNameException | InvalidEntityException ex){}
+        } catch (InvalidNameException | InvalidEntityException ex) {
+        }
 
         toEdit.setId(id);
-        return new ResponseEntity(service.editUser(toEdit), HttpStatus.OK);
+        toEdit.setRoles(Sets.newHashSet(roleService.getRoleByAuthority("USER")));
+        return new ResponseEntity(userService.editUser(toEdit, authService.getUserId()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole(ROLE_USER)")
-    public ResponseEntity<ApplicationUser> deleteUserById(@PathVariable int id) throws InvalidIdException {
-        service.deleteUserById(id);
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<User> deleteUserById(@PathVariable int id) throws InvalidIdException, InvalidEntityException, InvalidNameException, AccessDeniedException {
+        userService.deleteUserById(id, authService.getUserId());
         return new ResponseEntity(HttpStatus.OK);
     }
 

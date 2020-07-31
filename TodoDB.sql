@@ -14,16 +14,16 @@ CREATE TABLE Todos(
 	Id INT PRIMARY KEY AUTO_INCREMENT,
     `Name` VARCHAR(50) NOT NULL,
     `Description` VARCHAR(255) NULL,
-    -- User_Id INT NOT NULL,
+    User_Id INT NOT NULL,
     Start_Date DATE NOT NULL,
     End_Date DATE NULL,
-    Finished BOOLEAN NOT NULL DEFAULT 0 -- ,
-   -- FOREIGN KEY(User_Id) REFERENCES Users(Id)
+    Finished BOOLEAN NOT NULL DEFAULT 0,
+   FOREIGN KEY(User_Id) REFERENCES Users(Id)
 );
 
 CREATE TABLE Roles(
 	Id INT PRIMARY KEY AUTO_INCREMENT,
-	Authority VARCHAR(50) NULL
+	Authority VARCHAR(50) UNIQUE NOT NULL
 );
 
 CREATE TABLE Users_Roles(
@@ -33,9 +33,4 @@ CREATE TABLE Users_Roles(
 	FOREIGN KEY(User_Id) REFERENCES Users(Id),
 	FOREIGN KEY(Role_Id) REFERENCES Roles(Id)
 );
-
-INSERT INTO Users(Username, `Password`) VALUES('Sam','password');
-INSERT INTO Roles(Authority) VALUES('USER');
-UPDATE Users SET `Password` = '$2a$10$S8nFUMB8YIEioeWyap24/ucX.dC6v9tXCbpHjJVQUkrXlrH1VLaAS' WHERE id = 1;
-INSERT INTO Users_Roles(User_Id,Role_Id) VALUES(1,1);
 

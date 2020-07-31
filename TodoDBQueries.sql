@@ -1,0 +1,4 @@
+USE TodoDB;
+
+SELECT * FROM Todos;
+SELECT * FROM Users WHERE Id = 1;

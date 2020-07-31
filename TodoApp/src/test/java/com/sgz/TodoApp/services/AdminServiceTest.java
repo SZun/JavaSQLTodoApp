@@ -1,139 +1,67 @@
 package com.sgz.TodoApp.services;
 
 import com.google.common.collect.Sets;
-import com.sgz.TodoApp.TestAppConfig;
-import com.sgz.TodoApp.entities.ApplicationRole;
-import com.sgz.TodoApp.entities.ApplicationUser;
+import com.sgz.TodoApp.entities.Role;
+import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
-import com.sgz.TodoApp.exceptions.InvalidNameException;
+import com.sgz.TodoApp.repos.RoleRepo;
 import com.sgz.TodoApp.repos.UserRepo;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TestAppConfig.class)
+@ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
-    @Autowired
+    @InjectMocks
     private AdminService toTest;
 
-    @Autowired
-    private JdbcTemplate jdbc;
+    @Mock
+    private UserRepo userRepo;
 
-    @Autowired
-    private UserRepo repo;
+    @Mock
+    private RoleRepo roleRepo;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
+    @Mock
     private PasswordEncoder passwordEncoder;
 
-    private final Set<ApplicationRole> testRoles = Sets.newHashSet(new ApplicationRole(1, "USER"));
+    private final User testUser = new User(1, "@amBam20", "Sam");
 
-    private final String testLongString = "C39V2iGLMtU1xN8tctQQVPnr7Y41mgIqCCPKookK7yrKP9xweAp6Oo7NGOBp6wkWIP1cQZvxW2n40ZK0vUUHWxQzhjUCRnUXFx1uSSKXYP37nlsLcMnmaxpnGY7JGmKap7Q4e1mdtVg3aZ829B3IeMCzxTs2Ex5IOrbgu55cwUKh3z7GBFssVQL4mzr1eHqfOv67prPQgcCQCDIRSEZH1tt0h5yxVgVt2prBdgUWBmo6sg6UPS6k1quBYGDoFBIk";
+    private final Role testRole = new Role(1, "USER");
 
-    @BeforeEach
-    void setUp() throws InvalidEntityException, InvalidNameException {
-        repo.deleteAll();
-        jdbc.update("DELETE FROM Roles");
-        jdbc.update("ALTER TABLE Users auto_increment = 1");
-        jdbc.update("ALTER TABLE Roles auto_increment = 1");
-        jdbc.update("INSERT INTO Roles(Authority) VALUES('USER'),('ADMIN')");
-        userService.createUser(new ApplicationUser(testRoles, "@amBam20","Sam"));
+    private final Role expectedRole = new Role(1, "USER", Arrays.asList(this.testUser));
+
+    private final User expectedUser = new User(1, "@amBam20", "Sam", Sets.newHashSet(this.testRole));
+
+    private final String testLongString = "1ZvBWFVdBu62e6yT87rdELXaLP6KfY2wJ9ZRpw9KmZqzNFICvlNKgkCU28aKRpQb2I85EqAxr6Xb4A1Ct4yNEjTOAXgNyyIBEyTnjOYyN4piLPot1OYtnNftyVXZg6DSxlAGgYzBa5ATYzkSHo2EmIpNyc0NCXvFtPdwP1N30s1Fn63sBaQGdX8sZffYO29yTVtg4LLYRdrrP8aPmL2Pm3c3XySoA7KLLNIi8417yXnjzgdDQErkKiAuoR5REsdL";
+
+    @Test
+    void updateRoleUsers() throws InvalidIdException, InvalidEntityException {
+        when(roleRepo.save(any(Role.class))).thenReturn(expectedRole);
+
+        Role fromService = toTest.updateRoleUsers(expectedRole);
+
+        assertEquals(expectedRole, fromService);
     }
 
     @Test
-    void updateUserRole() throws InvalidIdException, InvalidEntityException {
-        Set<ApplicationRole> newRoles = Sets.newHashSet(new ApplicationRole(1, "USER"), new ApplicationRole(2, "ADMIN"));
+    void updateUserRoles() throws InvalidIdException, InvalidEntityException {
+        when(userRepo.save(any(User.class))).thenReturn(expectedUser);
 
-        ApplicationUser original = new ApplicationUser(1, testRoles, "@amBam20", "Sam");
+        User fromService = toTest.updateUserRoles(expectedUser);
 
-        ApplicationUser fromService = userService.getUserById(1);
+        assertEquals(expectedUser, fromService);
 
-        assertEquals(original.getId(), fromService.getId());
-        assertEquals(original.getAuthorities(), fromService.getAuthorities());
-        assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
-        assertEquals(original.getUsername(), fromService.getUsername());
-
-        ApplicationUser expected = new ApplicationUser(1, newRoles, fromService.getPassword(), "Sam");
-
-        fromService = toTest.updateUserRole(expected);
-        assertEquals(fromService, expected);
-
-        assertEquals(original.getId(), fromService.getId());
-        assertNotEquals(original.getAuthorities(), fromService.getAuthorities());
-        assertTrue(passwordEncoder.matches(original.getPassword(), fromService.getPassword()));
-        assertEquals(original.getUsername(), fromService.getUsername());
-
-        fromService = userService.getUserById(1);
-        assertEquals(fromService, expected);
     }
-
-    @Test
-    void updateUserRoleInvalidId() throws InvalidEntityException {
-        ApplicationUser testUser = new ApplicationUser(-1, testRoles, "@amBam20", "Sam");
-        try {
-            toTest.updateUserRole(testUser);
-            fail("should hit InvalidIdException");
-        } catch (InvalidIdException ex) {}
-    }
-
-    @Test
-    void updateUserRoleNullUser() throws InvalidIdException {
-        try {
-            toTest.updateUserRole(null);
-            fail("should hit InvalidEntityException");
-        } catch (InvalidEntityException ex) {}
-    }
-
-    @Test
-    void updateUserRoleEmptyAuthorities() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, new HashSet<>(), "@amBam20", "Sam");
-        try {
-            toTest.updateUserRole(testUser);
-            fail("should hit InvalidEntityException");
-        } catch (InvalidEntityException ex) {}
-    }
-
-    @Test
-    void updateUserRoleNullAuthorities() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, null, "@amBam20", "Sam");
-        try {
-            toTest.updateUserRole(testUser);
-            fail("should hit InvalidEntityException");
-        } catch (InvalidEntityException ex) {}
-    }
-
-    @Test
-    void updateUserRoleNameDiff() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, testRoles, "@amBam20", "Sammy");
-        try {
-            toTest.updateUserRole(testUser);
-            fail("should hit InvalidEntityException");
-        } catch (InvalidEntityException ex) {}
-    }
-
-    @Test
-    void updateUserRolePasswordDiff() throws InvalidIdException {
-        ApplicationUser testUser = new ApplicationUser(1, testRoles, "@amBam22", "Sam");
-        try {
-            toTest.updateUserRole(testUser);
-            fail("should hit InvalidEntityException");
-        } catch (InvalidEntityException ex) {}
-    }
-
 
 }

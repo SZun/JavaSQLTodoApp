@@ -9,6 +9,7 @@ import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
+import com.sgz.TodoApp.services.AuthService;
 import com.sgz.TodoApp.services.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,37 +29,40 @@ import java.util.List;
 public class TodoController {
     
     @Autowired
-    TodoService service;
+    private TodoService todoService;
+
+    @Autowired
+    private AuthService authService;
     
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<Todo>> getAll() throws NoItemsException{
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(todoService.getAllTodos(authService.getUserId()));
     }
     
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Todo> getById(@PathVariable int id) throws InvalidIdException {
-        return ResponseEntity.ok(service.getById(id));
+        return ResponseEntity.ok(todoService.getTodoById(id, authService.getUserId()));
     }
     
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity deleteById(@PathVariable int id) throws InvalidIdException {
-        service.deleteTodo(id);
+        todoService.deleteTodoById(id, authService.getUserId());
         return new ResponseEntity(HttpStatus.OK);
     }
     
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Todo> addTodo(@Valid @RequestBody Todo toAdd) throws InvalidEntityException{
-        return new ResponseEntity(service.createTodo(toAdd), HttpStatus.CREATED);
+        return new ResponseEntity(todoService.createTodo(toAdd, authService.getUserId()), HttpStatus.CREATED);
     }
     
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toAdd) throws InvalidEntityException, InvalidIdException{
         toAdd.setId(id);
-        return new ResponseEntity(service.editTodo(toAdd), HttpStatus.OK);
+        return new ResponseEntity(todoService.editTodo(toAdd, authService.getUserId()), HttpStatus.OK);
     }
 }

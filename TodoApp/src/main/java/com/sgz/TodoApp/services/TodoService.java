@@ -5,7 +5,6 @@
  */
 package com.sgz.TodoApp.services;
 
-import com.google.common.base.Strings;
 import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
@@ -19,70 +18,74 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *
  * @author samg.zun
  */
 @Service
 public class TodoService {
 
-    @Autowired
-    TodoRepo repo;
+    private final TodoRepo todoRepo;
 
-    public List<Todo> getAll() throws NoItemsException {
-        List<Todo> allTodos = repo.findAll();
-        if (allTodos.isEmpty()) {
-            throw new NoItemsException("No Items");
-        }
+    @Autowired
+    public TodoService(TodoRepo todoRepo) {
+        this.todoRepo = todoRepo;
+    }
+
+    public List<Todo> getAllTodos(int userId) throws NoItemsException {
+        List<Todo> allTodos = todoRepo.findAllByUser_Id(userId);
+
+        if (allTodos.isEmpty()) throw new NoItemsException("No Items");
+
         return allTodos;
     }
 
-    public Todo getById(int id) throws InvalidIdException {
-        Optional<Todo> toGet = repo.findById(id);
-        if (!toGet.isPresent()) {
-            throw new InvalidIdException("Invalid Id");
-        }
+    public Todo getTodoById(int id, int userId) throws InvalidIdException {
+        Optional<Todo> toGet = todoRepo.findByIdAndUser_Id(id, userId);
+
+        if (!toGet.isPresent()) throw new InvalidIdException("Invalid Id");
+
         return toGet.get();
     }
 
-    public Todo createTodo(Todo toAdd) throws InvalidEntityException {
-        validate(toAdd);
-        return repo.save(toAdd);
+    public Todo createTodo(Todo toAdd, int userId) throws InvalidEntityException {
+        validateTodo(toAdd);
+        toAdd.getUser().setId(userId);
+        toAdd.setEndDate(null);
+        toAdd.setFinished(false);
+        return todoRepo.save(toAdd);
     }
 
-    public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException{
-        validate(toEdit);
-        checkExists(toEdit.getId());
-        
-        return repo.save(toEdit);
-    }
-            
-    public void deleteTodo(int id) throws InvalidIdException {
-        checkExists(id);
-        
-        repo.deleteById(id);
-    }
-    
-    private void checkExists(int id) throws InvalidIdException {
-        if(!repo.existsById(id)){
-            throw new InvalidIdException("Invalid Id");
-        }
+    public Todo editTodo(Todo toEdit, int userId) throws InvalidEntityException, InvalidIdException {
+        validateTodo(toEdit);
+        checkExists(toEdit.getId(), userId);
+
+        toEdit.getUser().setId(userId);
+        return todoRepo.save(toEdit);
     }
 
-    private void validate(Todo toUpsert) throws InvalidEntityException {
-        if(toUpsert == null 
-            || Strings.isNullOrEmpty(toUpsert.getName().trim())
-            || toUpsert.getName().trim().length() > 50
-            || (toUpsert.getDescription() != null
+    public void deleteTodoById(int id, int userId) throws InvalidIdException {
+        checkExists(id, userId);
+        todoRepo.deleteById(id);
+    }
+
+    private void checkExists(int id, int userId) throws InvalidIdException {
+        if (!todoRepo.existsByIdAndUser_Id(id, userId)) throw new InvalidIdException("Invalid Id");
+    }
+
+    private void validateTodo(Todo toUpsert) throws InvalidEntityException {
+        if (toUpsert == null
+                || toUpsert.getName().trim().isEmpty()
+                || toUpsert.getName().trim().length() > 50
+                || (toUpsert.getDescription() != null
                 && toUpsert.getDescription().length() > 255)
-            || toUpsert.getStartDate().isBefore(LocalDate.now())
-            || (toUpsert.getEndDate() != null 
+                || (toUpsert.getEndDate() != null
                 && toUpsert.getEndDate().isBefore(toUpsert.getStartDate())
-                )
-            || (toUpsert.getEndDate() != null 
+        )
+                || (toUpsert.getEndDate() != null
                 && toUpsert.getEndDate().isAfter(LocalDate.now())
-                )
-                ){
+        )
+        ) {
             throw new InvalidEntityException("Invalid entity");
         }
     }
+
 }
