@@ -77,7 +77,7 @@ class TodoServiceTest {
     @Test
     void createTodo() throws InvalidEntityException {
         final Todo expected = new Todo(1,  "Walk Dog", null, LocalDate.now(), null, false, this.testUser);
-        when(todoRepo.save(any())).thenReturn(expected);
+        when(todoRepo.save(any(Todo.class))).thenReturn(expected);
 
         Todo fromService = toTest.createTodo(testTodo, 1);
 
@@ -127,7 +127,7 @@ class TodoServiceTest {
 
     @Test
     void editTodo() throws InvalidIdException, InvalidEntityException {
-        when(todoRepo.save(any())).thenReturn(expectedTodo);
+        when(todoRepo.save(any(Todo.class))).thenReturn(expectedTodo);
         when(todoRepo.existsByIdAndUser_Id(anyInt(), anyInt())).thenReturn(true);
 
         Todo fromService = toTest.editTodo(expectedTodo,1);

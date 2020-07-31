@@ -49,6 +49,8 @@ public class TodoService {
     public Todo createTodo(Todo toAdd, int userId) throws InvalidEntityException {
         validateTodo(toAdd);
         toAdd.getUser().setId(userId);
+        toAdd.setEndDate(null);
+        toAdd.setFinished(false);
         return todoRepo.save(toAdd);
     }
 

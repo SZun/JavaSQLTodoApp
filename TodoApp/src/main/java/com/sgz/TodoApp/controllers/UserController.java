@@ -3,8 +3,8 @@ package com.sgz.TodoApp.controllers;
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.*;
-import com.sgz.TodoApp.services.AdminService;
 import com.sgz.TodoApp.services.AuthService;
+import com.sgz.TodoApp.services.RoleService;
 import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private AdminService roleService;
+    private RoleService roleService;
 
     @Autowired
     private AuthService authService;
