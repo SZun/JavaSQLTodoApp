@@ -161,7 +161,7 @@ class AdminServiceTest {
     }
 
     @Test
-    void getAll() throws NoItemsException {
+    void getAllUsers() throws NoItemsException {
         User expected2 = new User(1, "@amBam22", "Sam2", Sets.newHashSet(testRole));
         User expected3 = new User(1, "@amBam23", "Sam3", Sets.newHashSet(testRole));
 
@@ -176,7 +176,7 @@ class AdminServiceTest {
     }
 
     @Test
-    void getAllNoItems() {
+    void getAllUsersNoItems() {
         assertThrows(NoItemsException.class, () -> toTest.getAllUsers());
     }
 

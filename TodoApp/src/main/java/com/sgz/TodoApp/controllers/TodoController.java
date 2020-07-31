@@ -45,7 +45,7 @@ public class TodoController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity deleteById(@PathVariable int id) throws InvalidIdException {
-        service.deleteTodo(id);
+        service.deleteTodoById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
     

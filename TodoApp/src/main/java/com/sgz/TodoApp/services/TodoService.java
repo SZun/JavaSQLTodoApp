@@ -5,7 +5,6 @@
  */
 package com.sgz.TodoApp.services;
 
-import com.google.common.base.Strings;
 import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- *
  * @author samg.zun
  */
 @Service
@@ -59,40 +57,39 @@ public class TodoService {
         return todoRepo.save(toAdd);
     }
 
-    public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException{
+    public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException {
         validateTodo(toEdit);
         checkExists(toEdit.getId());
         toEdit.setUser(getUserByName());
-        
+
         return todoRepo.save(toEdit);
     }
-            
-    public void deleteTodo(int id) throws InvalidIdException {
+
+    public void deleteTodoById(int id) throws InvalidIdException {
         checkExists(id);
-        
+
         todoRepo.deleteById(id);
     }
-    
+
     private void checkExists(int id) throws InvalidIdException {
-        if(!todoRepo.existsByIdAndUser_Id(id, getUserByName().getId())){
+        if (!todoRepo.existsByIdAndUser_Id(id, getUserByName().getId())) {
             throw new InvalidIdException("Invalid Id");
         }
     }
 
     private void validateTodo(Todo toUpsert) throws InvalidEntityException {
-        if(toUpsert == null 
-            || Strings.isNullOrEmpty(toUpsert.getName().trim())
-            || toUpsert.getName().trim().length() > 50
-            || (toUpsert.getDescription() != null
+        if (toUpsert == null
+                || toUpsert.getName().trim().isEmpty()
+                || toUpsert.getName().trim().length() > 50
+                || (toUpsert.getDescription() != null
                 && toUpsert.getDescription().length() > 255)
-            || toUpsert.getStartDate().isBefore(LocalDate.now())
-            || (toUpsert.getEndDate() != null 
+                || (toUpsert.getEndDate() != null
                 && toUpsert.getEndDate().isBefore(toUpsert.getStartDate())
-                )
-            || (toUpsert.getEndDate() != null 
+        )
+                || (toUpsert.getEndDate() != null
                 && toUpsert.getEndDate().isAfter(LocalDate.now())
-                )
-                ){
+        )
+        ) {
             throw new InvalidEntityException("Invalid entity");
         }
     }

@@ -43,7 +43,6 @@ public class Todo {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "Start Date can not be null")
-    @FutureOrPresent(message = "Start Date must be in future or today")
     @Column(nullable = false)
     @NonNull
     private LocalDate startDate;
