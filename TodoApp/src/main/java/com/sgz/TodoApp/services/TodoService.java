@@ -30,8 +30,8 @@ public class TodoService {
         this.todoRepo = todoRepo;
     }
 
-    public List<Todo> getAllTodos(int id) throws NoItemsException {
-        List<Todo> allTodos = todoRepo.findAllByUser_Id(id);
+    public List<Todo> getAllTodos(int userId) throws NoItemsException {
+        List<Todo> allTodos = todoRepo.findAllByUser_Id(userId);
 
         if (allTodos.isEmpty()) throw new NoItemsException("No Items");
 
