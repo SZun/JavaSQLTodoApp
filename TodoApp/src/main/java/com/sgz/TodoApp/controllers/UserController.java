@@ -20,25 +20,25 @@ public class UserController {
     private UserService service;
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> createUser(@Valid @RequestBody User toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
         return new ResponseEntity(service.createUser(toAdd), HttpStatus.CREATED);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<User>> getAllUsers() throws NoItemsException {
         return ResponseEntity.ok(service.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> getUserById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(service.getUserById(id));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> updateUserById(@PathVariable int id, @Valid @RequestBody User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException, InvalidNameException {
 
         try {
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> deleteUserById(@PathVariable int id) throws InvalidIdException, InvalidEntityException, InvalidNameException {
         service.deleteUserById(id);
         return new ResponseEntity(HttpStatus.OK);

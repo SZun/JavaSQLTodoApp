@@ -6,14 +6,11 @@
 package com.sgz.TodoApp.services;
 
 import com.sgz.TodoApp.entities.Todo;
-import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.repos.TodoRepo;
-import com.sgz.TodoApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,52 +24,49 @@ import java.util.Optional;
 public class TodoService {
 
     private final TodoRepo todoRepo;
-    private final UserRepo userRepo;
 
     @Autowired
-    public TodoService(TodoRepo todoRepo, UserRepo userRepo) {
+    public TodoService(TodoRepo todoRepo) {
         this.todoRepo = todoRepo;
-        this.userRepo = userRepo;
     }
 
-    public List<Todo> getAllTodos() throws NoItemsException {
-        List<Todo> allTodos = todoRepo.findAllByUser_Id(getUserByName().getId());
+    public List<Todo> getAllTodos(int id) throws NoItemsException {
+        List<Todo> allTodos = todoRepo.findAllByUser_Id(id);
         if (allTodos.isEmpty()) {
             throw new NoItemsException("No Items");
         }
         return allTodos;
     }
 
-    public Todo getTodoById(int id) throws InvalidIdException {
-        Optional<Todo> toGet = todoRepo.findByIdAndUser_Id(id, getUserByName().getId());
+    public Todo getTodoById(int id, int userId) throws InvalidIdException {
+        Optional<Todo> toGet = todoRepo.findByIdAndUser_Id(id, userId);
         if (!toGet.isPresent()) {
             throw new InvalidIdException("Invalid Id");
         }
         return toGet.get();
     }
 
-    public Todo createTodo(Todo toAdd) throws InvalidEntityException {
+    public Todo createTodo(Todo toAdd, int userId) throws InvalidEntityException {
         validateTodo(toAdd);
-        toAdd.setUser(getUserByName());
+        toAdd.getUser().setId(userId);
         return todoRepo.save(toAdd);
     }
 
-    public Todo editTodo(Todo toEdit) throws InvalidEntityException, InvalidIdException {
+    public Todo editTodo(Todo toEdit, int userId) throws InvalidEntityException, InvalidIdException {
         validateTodo(toEdit);
-        checkExists(toEdit.getId());
-        toEdit.setUser(getUserByName());
+        checkExists(toEdit.getId(), userId);
 
+        toEdit.getUser().setId(userId);
         return todoRepo.save(toEdit);
     }
 
-    public void deleteTodoById(int id) throws InvalidIdException {
-        checkExists(id);
-
+    public void deleteTodoById(int id, int userId) throws InvalidIdException {
+        checkExists(id, userId);
         todoRepo.deleteById(id);
     }
 
-    private void checkExists(int id) throws InvalidIdException {
-        if (!todoRepo.existsByIdAndUser_Id(id, getUserByName().getId())) {
+    private void checkExists(int id, int userId) throws InvalidIdException {
+        if (!todoRepo.existsByIdAndUser_Id(id, userId)) {
             throw new InvalidIdException("Invalid Id");
         }
     }
@@ -92,12 +86,6 @@ public class TodoService {
         ) {
             throw new InvalidEntityException("Invalid entity");
         }
-    }
-
-    private User getUserByName() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return userRepo.findByUsername(username).get();
     }
 
 }
