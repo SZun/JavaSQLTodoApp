@@ -27,7 +27,7 @@ public class AdminService {
 
     public Role updateRoleUsers(int id, List<Integer> userIds) throws InvalidIdException {
         List<User> users = new ArrayList<>();
-        for(Integer userId: userIds) {
+        for (Integer userId : userIds) {
             users.add(getUserById(userId));
         }
 
@@ -39,7 +39,7 @@ public class AdminService {
 
     public User updateUserRoles(int id, Set<Integer> roleIds) throws InvalidIdException {
         Set<Role> userRoles = new HashSet<>();
-        for(Integer roleId : roleIds) {
+        for (Integer roleId : roleIds) {
             userRoles.add(getRoleById(roleId));
         }
 
@@ -61,9 +61,9 @@ public class AdminService {
 
     public List<User> getAllUsers() throws NoItemsException {
         List<User> allUsers = userRepo.findAll();
-        if (allUsers.isEmpty()) {
-            throw new NoItemsException("No Items");
-        }
+
+        if (allUsers.isEmpty()) throw new NoItemsException("No Items");
+
         return allUsers;
     }
 
@@ -75,9 +75,9 @@ public class AdminService {
         }
 
         Optional<User> toGet = userRepo.findByUsername(username);
-        if (!toGet.isPresent()) {
-            throw new InvalidNameException("Name not found");
-        }
+
+        if (!toGet.isPresent()) throw new InvalidNameException("Name not found");
+
         return toGet.get();
     }
 
@@ -92,9 +92,9 @@ public class AdminService {
 
     public User getUserById(int id) throws InvalidIdException {
         Optional<User> toGet = userRepo.findById(id);
-        if (!toGet.isPresent()) {
-            throw new InvalidIdException("Invalid Id");
-        }
+
+        if (!toGet.isPresent()) throw new InvalidIdException("Invalid Id");
+
         return toGet.get();
     }
 
@@ -105,17 +105,17 @@ public class AdminService {
 
     public List<Role> getAllRoles() throws NoItemsException {
         List<Role> allRoles = roleRepo.findAll();
-        if (allRoles.isEmpty()) {
-            throw new NoItemsException("No Items");
-        }
+
+        if (allRoles.isEmpty()) throw new NoItemsException("No Items");
+
         return allRoles;
     }
 
     public Role getRoleById(int id) throws InvalidIdException {
         Optional<Role> toGet = roleRepo.findById(id);
-        if (!toGet.isPresent()) {
-            throw new InvalidIdException("Invalid Id");
-        }
+
+        if (!toGet.isPresent()) throw new InvalidIdException("Invalid Id");
+
         return toGet.get();
     }
 
@@ -127,9 +127,8 @@ public class AdminService {
         }
 
         Optional<Role> toGet = roleRepo.findByAuthority(authority);
-        if (!toGet.isPresent()) {
-            throw new InvalidAuthorityException("Authority not found");
-        }
+
+        if (!toGet.isPresent()) throw new InvalidAuthorityException("Authority not found");
 
         return toGet.get();
     }
@@ -174,26 +173,18 @@ public class AdminService {
     }
 
     private void checkExistsByAuthority(String authority) throws InvalidAuthorityException {
-        if (roleRepo.existsByAuthority(authority)) {
-            throw new InvalidAuthorityException("Authority already in use");
-        }
+        if (roleRepo.existsByAuthority(authority)) throw new InvalidAuthorityException("Authority already in use");
     }
 
     private void checkUserExists(int id) throws InvalidIdException {
-        if (!userRepo.existsById(id)) {
-            throw new InvalidIdException("Invalid Id");
-        }
+        if (!userRepo.existsById(id)) throw new InvalidIdException("Invalid Id");
     }
 
     private void checkRoleExists(int id) throws InvalidIdException {
-        if (!roleRepo.existsById(id)) {
-            throw new InvalidIdException("Invalid Id");
-        }
+        if (!roleRepo.existsById(id)) throw new InvalidIdException("Invalid Id");
     }
 
     private void checkExistsByUsername(String username) throws InvalidNameException {
-        if (userRepo.existsByUsername(username)) {
-            throw new InvalidNameException("Name already exists");
-        }
+        if (userRepo.existsByUsername(username)) throw new InvalidNameException("Name already exists");
     }
 }

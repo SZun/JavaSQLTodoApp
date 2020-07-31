@@ -1,7 +1,9 @@
 package com.sgz.TodoApp.controllers;
 
+import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.*;
+import com.sgz.TodoApp.services.AdminService;
 import com.sgz.TodoApp.services.AuthService;
 import com.sgz.TodoApp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +24,15 @@ public class UserController {
     private UserService userService;
 
     @Autowired
+    private AdminService roleService;
+
+    @Autowired
     private AuthService authService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> createUser(@Valid @RequestBody User toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
+        toAdd.setRoles(Sets.newHashSet(roleService.getRoleByAuthority("USER")));
         return new ResponseEntity(userService.createUser(toAdd), HttpStatus.CREATED);
     }
 
@@ -55,6 +61,7 @@ public class UserController {
         }
 
         toEdit.setId(id);
+        toEdit.setRoles(Sets.newHashSet(roleService.getRoleByAuthority("USER")));
         return new ResponseEntity(userService.editUser(toEdit, authService.getUserId()), HttpStatus.OK);
     }
 

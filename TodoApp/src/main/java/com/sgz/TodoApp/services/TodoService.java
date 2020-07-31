@@ -32,17 +32,17 @@ public class TodoService {
 
     public List<Todo> getAllTodos(int id) throws NoItemsException {
         List<Todo> allTodos = todoRepo.findAllByUser_Id(id);
-        if (allTodos.isEmpty()) {
-            throw new NoItemsException("No Items");
-        }
+
+        if (allTodos.isEmpty()) throw new NoItemsException("No Items");
+
         return allTodos;
     }
 
     public Todo getTodoById(int id, int userId) throws InvalidIdException {
         Optional<Todo> toGet = todoRepo.findByIdAndUser_Id(id, userId);
-        if (!toGet.isPresent()) {
-            throw new InvalidIdException("Invalid Id");
-        }
+
+        if (!toGet.isPresent()) throw new InvalidIdException("Invalid Id");
+
         return toGet.get();
     }
 
@@ -66,9 +66,7 @@ public class TodoService {
     }
 
     private void checkExists(int id, int userId) throws InvalidIdException {
-        if (!todoRepo.existsByIdAndUser_Id(id, userId)) {
-            throw new InvalidIdException("Invalid Id");
-        }
+        if (!todoRepo.existsByIdAndUser_Id(id, userId)) throw new InvalidIdException("Invalid Id");
     }
 
     private void validateTodo(Todo toUpsert) throws InvalidEntityException {
