@@ -8,7 +8,6 @@ import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.repos.TodoRepo;
-import com.sgz.TodoApp.repos.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,10 +15,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-//import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TodoServiceTest {
@@ -29,9 +31,6 @@ class TodoServiceTest {
 
     @Mock
     private TodoRepo todoRepo;
-
-    @Mock
-    private UserRepo userRepo;
 
     private final User testUser = new User(1, "@amBam20", "Sam", Sets.newHashSet(new Role(1, "USER")));
 
@@ -43,7 +42,17 @@ class TodoServiceTest {
 
     @Test
     void getAllTodos() throws NoItemsException {
+        final Todo expected2 = new Todo(2,  "Cook Dinner", "Finished cooking dinner", LocalDate.now(), LocalDate.now(), true, this.testUser);
+        final Todo expected3 = new Todo(3,  "Fix Car", "Finished fixing car", LocalDate.now(), LocalDate.now(), true, this.testUser);
 
+        when(todoRepo.findAllByUser_Id(anyInt())).thenReturn(Arrays.asList(expectedTodo, expected2, expected3));
+
+        List<Todo> fromService = toTest.getAllTodos(1);
+
+        assertEquals(3, fromService.size());
+        assertTrue(fromService.contains(expectedTodo));
+        assertTrue(fromService.contains(expected2));
+        assertTrue(fromService.contains(expected3));
     }
 
     @Test
@@ -53,6 +62,11 @@ class TodoServiceTest {
 
     @Test
     void getTodoById() throws InvalidIdException {
+        when(todoRepo.findByIdAndUser_Id(anyInt(), anyInt())).thenReturn(Optional.of(expectedTodo));
+
+        Todo fromService = toTest.getTodoById(1,1);
+
+        assertEquals(expectedTodo, fromService);
     }
 
     @Test
@@ -62,6 +76,12 @@ class TodoServiceTest {
 
     @Test
     void createTodo() throws InvalidEntityException {
+        final Todo expected = new Todo(1,  "Walk Dog", null, LocalDate.now(), null, false, this.testUser);
+        when(todoRepo.save(any())).thenReturn(expected);
+
+        Todo fromService = toTest.createTodo(testTodo, 1);
+
+        assertEquals(expected, fromService);
     }
 
     @Test
@@ -107,6 +127,12 @@ class TodoServiceTest {
 
     @Test
     void editTodo() throws InvalidIdException, InvalidEntityException {
+        when(todoRepo.save(any())).thenReturn(expectedTodo);
+        when(todoRepo.existsByIdAndUser_Id(anyInt(), anyInt())).thenReturn(true);
+
+        Todo fromService = toTest.editTodo(expectedTodo,1);
+
+        assertEquals(expectedTodo, fromService);
     }
 
     @Test
@@ -157,6 +183,8 @@ class TodoServiceTest {
 
     @Test
     void deleteTodoById() throws InvalidIdException {
+        when(todoRepo.existsByIdAndUser_Id(anyInt(), anyInt())).thenReturn(true);
+        toTest.deleteTodoById(1,1);
     }
 
     @Test

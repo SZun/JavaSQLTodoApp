@@ -17,8 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,7 +50,7 @@ class AdminServiceTest {
     void updateRoleUsers() throws InvalidIdException {
         when(roleRepo.findById(anyInt())).thenReturn(Optional.of(testRole));
         when(userRepo.findById(anyInt())).thenReturn(Optional.of(testUser));
-        when(roleRepo.save(expectedRole)).thenReturn(expectedRole);
+        when(roleRepo.save(any())).thenReturn(expectedRole);
 
         Role fromService = toTest.updateRoleUsers(1, Arrays.asList(1));
 
@@ -73,7 +72,7 @@ class AdminServiceTest {
     void updateUserRoles() throws InvalidIdException {
         when(roleRepo.findById(anyInt())).thenReturn(Optional.of(testRole));
         when(userRepo.findById(anyInt())).thenReturn(Optional.of(testUser));
-        when(userRepo.save(expectedUser)).thenReturn(expectedUser);
+        when(userRepo.save(any())).thenReturn(expectedUser);
 
         User fromService = toTest.updateUserRoles(1, Sets.newHashSet(1));
 
@@ -97,7 +96,7 @@ class AdminServiceTest {
         final User toCreate = new User("@amBam20", "Sam");
 
         when(passwordEncoder.encode(anyString())).thenReturn(toCreate.getPassword());
-        when(userRepo.save(toCreate)).thenReturn(testUser);
+        when(userRepo.save(any())).thenReturn(testUser);
 
         User fromService = toTest.createUser(toCreate);
 
@@ -220,7 +219,7 @@ class AdminServiceTest {
 
         when(userRepo.existsById(anyInt())).thenReturn(true);
         when(passwordEncoder.encode(anyString())).thenReturn(toEdit.getPassword());
-        when(userRepo.save(toEdit)).thenReturn(testUser);
+        when(userRepo.save(any())).thenReturn(testUser);
 
         User fromService = toTest.editUser(toEdit);
 
@@ -378,7 +377,7 @@ class AdminServiceTest {
     void createRole() throws InvalidEntityException, InvalidAuthorityException {
         final Role toCreate = new Role("USER");
 
-        when(roleRepo.save(toCreate)).thenReturn(testRole);
+        when(roleRepo.save(any())).thenReturn(testRole);
 
         Role fromService = toTest.createRole(toCreate);
 
