@@ -116,23 +116,23 @@ class TodoRepoTest {
 
     }
 
-//    @Test
-//    void existsByIdAndUser_Id() {
-//        given(toTest.existsByIdAndUser_Id(anyInt(),anyInt())).willReturn(true);
-//
-//        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
-//        ArgumentCaptor<Integer> captor2 = ArgumentCaptor.forClass(Integer.class);
-//
-//        boolean fromRepo = toTest.existsByIdAndUser_Id(1,1);
-//
-//        verify(toTest).existsByIdAndUser_Id(captor.capture(), captor2.getValue());
-//
-//        Integer expectedParam = captor.getValue();
-//        assertEquals(1, expectedParam);
-//
-//        expectedParam = captor2.getValue();
-//        assertEquals(1, expectedParam);
-//
-//        assertTrue(fromRepo);
-//    }
+    @Test
+    void existsByIdAndUser_Id() {
+        given(toTest.existsByIdAndUser_Id(anyInt(),anyInt())).willReturn(true);
+
+        ArgumentCaptor<Integer> captor1 = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<Integer> captor2 = ArgumentCaptor.forClass(Integer.class);
+
+        boolean fromRepo = toTest.existsByIdAndUser_Id(1,1);
+
+        verify(toTest).existsByIdAndUser_Id(captor1.capture(), captor2.capture());
+
+        Integer expectedParam = captor1.getValue();
+        assertEquals(1, expectedParam);
+
+        expectedParam = captor2.getValue();
+        assertEquals(1, expectedParam);
+
+        assertTrue(fromRepo);
+    }
 }
