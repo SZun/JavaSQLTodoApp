@@ -124,7 +124,7 @@ class TodoControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(
                 post(baseURL)
-                        .content(objectMapper.writeValueAsString(testTodo))
+                        .content(expected)
                         .contentType(MediaType.APPLICATION_JSON)
         )
                 .andExpect(status().isCreated())
@@ -137,14 +137,14 @@ class TodoControllerTest {
     @Test
     @WithMockUser
     void updateTodo() throws Exception {
-        final String expected = "{\"id\":0,\"name\":\"Walk Dog\",\"description\":null,\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
+        final String expected = "{\"id\":1,\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
 
         when(authService.getUserId()).thenReturn(1);
         when(todoService.editTodo(any(Todo.class), anyInt())).thenReturn(expectedTodo);
 
         MvcResult mvcResult = mockMvc.perform(
                 put(baseURL + "1")
-                        .content(objectMapper.writeValueAsString(expectedTodo))
+                        .content(expected)
                         .contentType(MediaType.APPLICATION_JSON)
         )
                 .andExpect(status().isOk())
