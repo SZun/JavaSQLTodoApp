@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.User;
+import com.sgz.TodoApp.exceptions.InvalidIdException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.jwt.JwtConfig;
 import com.sgz.TodoApp.jwt.JwtSecretKey;
 import com.sgz.TodoApp.services.AdminService;
@@ -26,6 +28,7 @@ import javax.crypto.SecretKey;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -146,6 +149,25 @@ class AdminControllerTest {
     }
 
     @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void getAllRolesNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(get(baseURL + "roles"))).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "roles"))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
     void getAllRolesForbidden() throws Exception {
         mockMvc.perform(get(baseURL + "roles"))
                 .andExpect(status().isForbidden());
@@ -153,7 +175,7 @@ class AdminControllerTest {
 
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
-    void getAllRoleById() throws Exception {
+    void getRoleById() throws Exception {
         when(roleService.getRoleById(anyInt())).thenReturn(expectedRole);
 
         MvcResult mvcResult = mockMvc.perform(get(baseURL + "roles/1"))
@@ -162,6 +184,25 @@ class AdminControllerTest {
         String content = mvcResult.getResponse().getContentAsString();
 
         assertEquals("{\"id\":1,\"authority\":\"USER\"}", content);
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void getRoleByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(get(baseURL + "roles/1"))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "roles/1"))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -224,12 +265,34 @@ class AdminControllerTest {
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void deleteRoleById() throws Exception {
-        mockMvc.perform(delete(baseURL + "roles/1"))
-                .andExpect(status().isOk());
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "roles/1"))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals("1", content);
     }
 
     @Test
-    void deleteRoleByIdForbiddent() throws Exception {
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void deleteRoleByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+
+        when(mockMvc.perform(delete(baseURL + "roles/1"))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "roles/1"))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    void deleteRoleByIdForbidden() throws Exception {
         mockMvc.perform(delete(baseURL + "roles/1"))
                 .andExpect(status().isForbidden());
     }

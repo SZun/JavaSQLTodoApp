@@ -29,7 +29,7 @@ public class ExceptionHandlerController {
             InvalidIdException ex,
             WebRequest req) {
 
-        return new ResponseEntity<>(new CustomError(ex.getMessage(), "InvalidIdExceptiond"),
+        return new ResponseEntity<>(new CustomError(ex.getMessage(), "InvalidIdException"),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
@@ -69,7 +69,7 @@ public class ExceptionHandlerController {
             InvalidAuthorityException ex,
             WebRequest req) {
 
-        final String CUSTOM_ERR_MESSAGE = "Authroity entered is invalid";
+        final String CUSTOM_ERR_MESSAGE = "Authority entered is invalid";
 
         return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "InvalidAuthorityException"),
                 HttpStatus.UNPROCESSABLE_ENTITY);

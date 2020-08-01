@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.User;
+import com.sgz.TodoApp.exceptions.InvalidEntityException;
+import com.sgz.TodoApp.exceptions.InvalidIdException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.jwt.JwtConfig;
 import com.sgz.TodoApp.jwt.JwtSecretKey;
 import com.sgz.TodoApp.services.*;
@@ -23,6 +26,7 @@ import javax.crypto.SecretKey;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -105,6 +109,24 @@ class UserControllerTest {
 
     @Test
     @WithMockUser
+    void getAllUsersNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(get(baseURL))).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
     void getUserById() throws Exception {
         when(userService.getUserById(anyInt())).thenReturn(expectedUser);
 
@@ -113,6 +135,24 @@ class UserControllerTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         assertEquals("{\"id\":1,\"password\":\"@amBam20\",\"username\":\"Sam\"}", content);
+    }
+
+    @Test
+    @WithMockUser
+    void getUserByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(get(baseURL + "1"))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "1"))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -139,8 +179,29 @@ class UserControllerTest {
     void deleteUserById() throws Exception {
         when(authService.getUserId()).thenReturn(1);
 
-        mockMvc.perform(delete(baseURL + "1"))
-                .andExpect(status().isOk());
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "1"))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals("1", content);
+    }
+
+    @Test
+    @WithMockUser
+    void deleteUserByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(delete(baseURL + "1"))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "1"))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
