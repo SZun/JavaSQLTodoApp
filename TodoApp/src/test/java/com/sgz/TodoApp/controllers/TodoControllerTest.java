@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.entities.User;
+import com.sgz.TodoApp.exceptions.InvalidIdException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.jwt.JwtConfig;
 import com.sgz.TodoApp.jwt.JwtSecretKey;
 import com.sgz.TodoApp.services.AdminService;
@@ -28,6 +30,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -73,7 +76,7 @@ class TodoControllerTest {
 
     private final Todo testTodo = new Todo("Walk Dog", LocalDate.of(2020, 07, 31));
 
-    private final Todo expectedTodo = new Todo(1, "Walk Dog", "Finished walking baxter", LocalDate.now(), null, false, this.testUser);
+    private final Todo expectedTodo = new Todo(1, "Walk Dog", "Finished walking baxter", LocalDate.of(2020, 07, 31), null, false, this.testUser);
 
     @Test
     @WithMockUser
@@ -88,6 +91,24 @@ class TodoControllerTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         assertEquals(expected, content);
+    }
+
+    @Test
+    @WithMockUser
+    void getAllNoItems() throws Exception {
+        final String expectedMsg = "\"message\":\"No Items\",";
+        final String expectedName = "\"name\":\"NoItemsException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(get(baseURL))).thenThrow(new NoItemsException("No Items"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -110,8 +131,29 @@ class TodoControllerTest {
     void deleteById() throws Exception {
         when(authService.getUserId()).thenReturn(1);
 
-        mockMvc.perform(delete(baseURL + "1"))
-                .andExpect(status().isOk());
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "1"))
+                .andExpect(status().isOk()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertEquals("1", content);
+    }
+
+    @Test
+    @WithMockUser
+    void deleteByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(mockMvc.perform(delete(baseURL + "1"))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "1"))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
@@ -152,6 +194,21 @@ class TodoControllerTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         assertEquals(expected, content);
+    }
+
+    @Test
+    @WithMockUser
+    void updateTodoException() throws Exception {
+        final String expected = "{\"message\":\"Server Exception\",\"name\":\"Exception\",\"errors\":null,\"timestamp\":";
+
+        when(mockMvc.perform(delete(baseURL + "1"))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(put(baseURL + "1"))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expected));
     }
 
     @Test

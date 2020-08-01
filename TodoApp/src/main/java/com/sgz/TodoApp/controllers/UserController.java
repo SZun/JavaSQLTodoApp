@@ -66,9 +66,9 @@ public class UserController {
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<User> deleteUserById(@PathVariable int id) throws InvalidIdException, InvalidEntityException, InvalidNameException, AccessDeniedException {
+    public ResponseEntity<Integer> deleteUserById(@PathVariable int id) throws InvalidIdException, InvalidEntityException, InvalidNameException, AccessDeniedException {
         userService.deleteUserById(id, authService.getUserId());
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok(id);
     }
 
 }

@@ -21,47 +21,46 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- *
  * @author samg.zun
  */
 @RestController
 @RequestMapping("/api/v1/todos/")
 public class TodoController {
-    
+
     @Autowired
     private TodoService todoService;
 
     @Autowired
     private AuthService authService;
-    
+
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<List<Todo>> getAll() throws NoItemsException{
+    public ResponseEntity<List<Todo>> getAll() throws NoItemsException {
         return ResponseEntity.ok(todoService.getAllTodos(authService.getUserId()));
     }
-    
+
     @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Todo> getById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(todoService.getTodoById(id, authService.getUserId()));
     }
-    
+
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity deleteById(@PathVariable int id) throws InvalidIdException {
         todoService.deleteTodoById(id, authService.getUserId());
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.ok(id);
     }
-    
+
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Todo> addTodo(@Valid @RequestBody Todo toAdd) throws InvalidEntityException{
+    public ResponseEntity<Todo> addTodo(@Valid @RequestBody Todo toAdd) throws InvalidEntityException {
         return new ResponseEntity(todoService.createTodo(toAdd, authService.getUserId()), HttpStatus.CREATED);
     }
-    
+
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toEdit) throws InvalidEntityException, InvalidIdException{
+    public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toEdit) throws InvalidEntityException, InvalidIdException {
         toEdit.setId(id);
         return ResponseEntity.ok(todoService.editTodo(toEdit, authService.getUserId()));
     }

@@ -63,7 +63,7 @@ public class AdminController {
 
     @GetMapping("roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> getAllRoleById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<Role> getRoleById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
