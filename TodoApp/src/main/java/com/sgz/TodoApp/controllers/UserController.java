@@ -17,7 +17,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/users/")
 public class UserController {
 
     @Autowired
@@ -29,8 +29,7 @@ public class UserController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("create")
     public ResponseEntity<User> createUser(@Valid @RequestBody User toAdd) throws InvalidEntityException, InvalidNameException, InvalidAuthorityException {
         toAdd.setRoles(Sets.newHashSet(roleService.getRoleByAuthority("USER")));
         return new ResponseEntity(userService.createUser(toAdd), HttpStatus.CREATED);
@@ -42,13 +41,13 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> getUserById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> updateUserById(@PathVariable int id, @Valid @RequestBody User toEdit) throws InvalidEntityException, InvalidIdException, InvalidAuthorityException, InvalidNameException, AccessDeniedException {
         try {
@@ -65,7 +64,7 @@ public class UserController {
         return new ResponseEntity(userService.editUser(toEdit, authService.getUserId()), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<User> deleteUserById(@PathVariable int id) throws InvalidIdException, InvalidEntityException, InvalidNameException, AccessDeniedException {
         userService.deleteUserById(id, authService.getUserId());
