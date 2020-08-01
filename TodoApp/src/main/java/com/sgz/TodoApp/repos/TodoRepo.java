@@ -11,18 +11,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  *
  * @author samg.zun
  */
 @Repository
-public interface TodoRepo extends JpaRepository<Todo, Integer> {
+public interface TodoRepo extends JpaRepository<Todo, UUID> {
 
-    List<Todo> findAllByUser_Id(int id);
+    List<Todo> findAllByUser_Id(UUID id);
 
-    Optional<Todo> findByIdAndUser_Id(int id, int userId);
+    Optional<Todo> findByIdAndUser_Id(UUID id, UUID userId);
 
-    boolean existsByIdAndUser_Id(int id, int userId);
+    boolean existsByIdAndUser_Id(UUID id, UUID userId);
 
 }

@@ -10,8 +10,12 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /**
  *
@@ -29,7 +33,7 @@ public class Todo {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private int id;
+    private UUID id = UUID.randomUUID();
 
     @NotBlank(message = "Name can not be blank")
     @Size(max = 50, message = "Name can not be more than 50 characters")

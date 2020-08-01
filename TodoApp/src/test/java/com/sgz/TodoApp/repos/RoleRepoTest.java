@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,9 +25,11 @@ class RoleRepoTest {
     @Mock
     private RoleRepo toTest;
 
-    private final User testUser = new User(1, "@amBam20", "Sam");
+    private final UUID id = new UUID(36,36);
 
-    private final Role expectedRole = new Role(1, "USER", Arrays.asList(this.testUser));
+    private final User testUser = new User(this.id, "@amBam20", "Sam");
+
+    private final Role expectedRole = new Role(this.id, "USER", Arrays.asList(this.testUser));
 
     @Test
     void save(){
@@ -39,7 +42,7 @@ class RoleRepoTest {
         verify(toTest).save(captor.capture());
 
         Role expectedParam = captor.getValue();
-        assertEquals(1, expectedParam.getId());
+        assertEquals(id, expectedParam.getId());
         assertEquals("USER", expectedParam.getAuthority());
         assertEquals(Arrays.asList(this.testUser), expectedParam.getUsers());
 
@@ -48,34 +51,34 @@ class RoleRepoTest {
 
     @Test
     void findById(){
-        given(toTest.findById(anyInt())).willReturn(Optional.of(expectedRole));
+        given(toTest.findById(any(UUID.class))).willReturn(Optional.of(expectedRole));
 
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        Optional<Role> fromRepo = toTest.findById(1);
+        Optional<Role> fromRepo = toTest.findById(id);
 
         verify(toTest).findById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
         assertTrue(fromRepo.isPresent());
         assertEquals(expectedRole, fromRepo.get());
     }
 
     @Test
     void existsById(){
-        given(toTest.existsById(anyInt())).willReturn(true);
+        given(toTest.existsById(any(UUID.class))).willReturn(true);
 
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        boolean fromRepo = toTest.existsById(1);
+        boolean fromRepo = toTest.existsById(id);
 
         verify(toTest).existsById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
         assertTrue(fromRepo);
     }
 
@@ -97,31 +100,31 @@ class RoleRepoTest {
 
     @Test
     void findByIdEmpty(){
-        given(toTest.findById(anyInt())).willReturn(Optional.empty());
+        given(toTest.findById(any(UUID.class))).willReturn(Optional.empty());
 
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        Optional<Role> fromRepo = toTest.findById(1);
+        Optional<Role> fromRepo = toTest.findById(id);
 
         verify(toTest).findById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
         assertTrue(fromRepo.isEmpty());
     }
 
     @Test
     void deleteById(){
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        toTest.deleteById(1);
+        toTest.deleteById(id);
 
         verify(toTest).deleteById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
     }
 
     @Test
