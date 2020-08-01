@@ -25,7 +25,7 @@ import java.util.List;
  * @author samg.zun
  */
 @RestController
-@RequestMapping("/api/v1/todos")
+@RequestMapping("/api/v1/todos/")
 public class TodoController {
     
     @Autowired
@@ -40,13 +40,13 @@ public class TodoController {
         return ResponseEntity.ok(todoService.getAllTodos(authService.getUserId()));
     }
     
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Todo> getById(@PathVariable int id) throws InvalidIdException {
         return ResponseEntity.ok(todoService.getTodoById(id, authService.getUserId()));
     }
     
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity deleteById(@PathVariable int id) throws InvalidIdException {
         todoService.deleteTodoById(id, authService.getUserId());
@@ -59,7 +59,7 @@ public class TodoController {
         return new ResponseEntity(todoService.createTodo(toAdd, authService.getUserId()), HttpStatus.CREATED);
     }
     
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toAdd) throws InvalidEntityException, InvalidIdException{
         toAdd.setId(id);
