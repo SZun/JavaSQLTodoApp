@@ -9,9 +9,8 @@ import com.sgz.TodoApp.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.nio.file.AccessDeniedException;
@@ -22,8 +21,7 @@ import java.util.List;
  *
  * @author samg.zun
  */
-@ControllerAdvice
-@RestController
+@RestControllerAdvice
 public class ExceptionHandlerController {
 
     @ExceptionHandler(InvalidIdException.class)
@@ -97,6 +95,12 @@ public class ExceptionHandlerController {
         });
 
         CustomError err = new CustomError("Fields are invalid", "InvalidERequestBodyException", errs);
+        return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CustomError> catchAll(Exception ex) {
+        CustomError err = new CustomError("Server Exception", "Exception");
         return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
     }
 
