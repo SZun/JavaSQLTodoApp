@@ -42,10 +42,10 @@ public class AdminController {
         for (Integer roleId : roleIds) {
             roles.add(roleService.getRoleById(roleId));
         }
-        return new ResponseEntity(adminService.updateUserRoles(toEdit), HttpStatus.OK);
+        return ResponseEntity.ok(adminService.updateUserRoles(toEdit));
     }
 
-    @PutMapping("roles/users/{id}")
+    @PutMapping("roles/{id}/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> updateRolesUsers(@PathVariable int id, @RequestBody List<Integer> userIds) throws InvalidIdException, InvalidEntityException {
         Role toEdit = roleService.getRoleById(id);
@@ -70,7 +70,7 @@ public class AdminController {
     @PostMapping("roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> createRole(@Valid @RequestBody Role toAdd) throws InvalidEntityException, InvalidAuthorityException {
-        return ResponseEntity.ok(roleService.createRole(toAdd));
+        return new ResponseEntity(roleService.createRole(toAdd), HttpStatus.CREATED);
     }
     @PutMapping("roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -89,7 +89,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Integer> deleteRoleById(@PathVariable int id) throws InvalidIdException {
         roleService.deleteRoleById(id);
-        return new ResponseEntity(id, HttpStatus.OK);
+        return ResponseEntity.ok(id);
     }
 
 }
