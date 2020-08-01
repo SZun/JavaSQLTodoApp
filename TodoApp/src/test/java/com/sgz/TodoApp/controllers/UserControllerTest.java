@@ -62,7 +62,7 @@ class UserControllerTest {
     @MockBean
     private SecretKey secretKey;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String baseURL = "/api/v1/users/";
 
@@ -80,9 +80,7 @@ class UserControllerTest {
         when(userService.createUser(any(User.class))).thenReturn(expectedUser);
 
         MvcResult mvcResult = mockMvc.perform(
-                post(
-                        baseURL + "create"
-                )
+                post(baseURL + "create")
                         .content(objectMapper.writeValueAsString(testUser))
                         .contentType(MediaType.APPLICATION_JSON)
         )

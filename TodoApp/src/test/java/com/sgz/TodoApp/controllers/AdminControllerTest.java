@@ -62,7 +62,7 @@ class AdminControllerTest {
     @MockBean
     private SecretKey secretKey;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final String baseURL = "/api/v1/admin/";
 

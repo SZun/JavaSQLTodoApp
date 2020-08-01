@@ -61,8 +61,8 @@ public class TodoController {
     
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toAdd) throws InvalidEntityException, InvalidIdException{
-        toAdd.setId(id);
-        return new ResponseEntity(todoService.editTodo(toAdd, authService.getUserId()), HttpStatus.OK);
+    public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toEdit) throws InvalidEntityException, InvalidIdException{
+        toEdit.setId(id);
+        return ResponseEntity.ok(todoService.editTodo(toEdit, authService.getUserId()));
     }
 }
