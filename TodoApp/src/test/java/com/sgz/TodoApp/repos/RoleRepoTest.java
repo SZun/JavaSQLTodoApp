@@ -14,8 +14,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -23,39 +22,39 @@ import static org.mockito.Mockito.verify;
 class RoleRepoTest {
 
     @Mock
-    private RoleRepo roleRepo;
+    private RoleRepo toTest;
 
     private final User testUser = new User(1, "@amBam20", "Sam");
-
-    private final Role testRole = new Role(1, "USER");
 
     private final Role expectedRole = new Role(1, "USER", Arrays.asList(this.testUser));
 
     @Test
     void save(){
-        given(roleRepo.save(expectedRole)).willReturn(expectedRole);
+        given(toTest.save(any(Role.class))).willReturn(expectedRole);
 
         ArgumentCaptor<Role> captor = ArgumentCaptor.forClass(Role.class);
 
-        Role fromRepo = roleRepo.save(expectedRole);
+        Role fromRepo = toTest.save(expectedRole);
 
-        verify(roleRepo).save(captor.capture());
+        verify(toTest).save(captor.capture());
 
-        Role expected = captor.getValue();
-        assertRoleFields(expected);
+        Role expectedParam = captor.getValue();
+        assertEquals(1, expectedParam.getId());
+        assertEquals("USER", expectedParam.getAuthority());
+        assertEquals(Arrays.asList(this.testUser), expectedParam.getUsers());
 
         assertEquals(expectedRole, fromRepo);
     }
 
     @Test
     void findById(){
-        given(roleRepo.findById(anyInt())).willReturn(Optional.of(expectedRole));
+        given(toTest.findById(anyInt())).willReturn(Optional.of(expectedRole));
 
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
 
-        Optional<Role> fromRepo = roleRepo.findById(1);
+        Optional<Role> fromRepo = toTest.findById(1);
 
-        verify(roleRepo).findById(captor.capture());
+        verify(toTest).findById(captor.capture());
 
         Integer expectedParam = captor.getValue();
 
@@ -65,14 +64,46 @@ class RoleRepoTest {
     }
 
     @Test
-    void findByIdEmpty(){
-        given(roleRepo.findById(anyInt())).willReturn(Optional.empty());
+    void existsById(){
+        given(toTest.existsById(anyInt())).willReturn(true);
 
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
 
-        Optional<Role> fromRepo = roleRepo.findById(1);
+        boolean fromRepo = toTest.existsById(1);
 
-        verify(roleRepo).findById(captor.capture());
+        verify(toTest).existsById(captor.capture());
+
+        Integer expectedParam = captor.getValue();
+
+        assertEquals(1, expectedParam);
+        assertTrue(fromRepo);
+    }
+
+    @Test
+    void existsByAuthority(){
+        given(toTest.existsByAuthority(anyString())).willReturn(true);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+        boolean fromRepo = toTest.existsByAuthority("USER");
+
+        verify(toTest).existsByAuthority(captor.capture());
+
+        String expectedParam = captor.getValue();
+
+        assertEquals("USER", expectedParam);
+        assertTrue(fromRepo);
+    }
+
+    @Test
+    void findByIdEmpty(){
+        given(toTest.findById(anyInt())).willReturn(Optional.empty());
+
+        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+
+        Optional<Role> fromRepo = toTest.findById(1);
+
+        verify(toTest).findById(captor.capture());
 
         Integer expectedParam = captor.getValue();
 
@@ -84,9 +115,9 @@ class RoleRepoTest {
     void deleteById(){
         ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
 
-        roleRepo.deleteById(1);
+        toTest.deleteById(1);
 
-        verify(roleRepo).deleteById(captor.capture());
+        verify(toTest).deleteById(captor.capture());
 
         Integer expectedParam = captor.getValue();
 
@@ -95,13 +126,13 @@ class RoleRepoTest {
 
     @Test
     void findByAuthority(){
-        given(roleRepo.findByAuthority(anyString())).willReturn(Optional.empty());
+        given(toTest.findByAuthority(anyString())).willReturn(Optional.empty());
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-        Optional<Role> fromRepo = roleRepo.findByAuthority("USER");
+        Optional<Role> fromRepo = toTest.findByAuthority("USER");
 
-        verify(roleRepo).findByAuthority(captor.capture());
+        verify(toTest).findByAuthority(captor.capture());
 
         String expectedParam = captor.getValue();
 
@@ -111,13 +142,13 @@ class RoleRepoTest {
 
     @Test
     void findByAuthorityEmpty(){
-        given(roleRepo.findByAuthority(anyString())).willReturn(Optional.of(expectedRole));
+        given(toTest.findByAuthority(anyString())).willReturn(Optional.of(expectedRole));
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-        Optional<Role> fromRepo = roleRepo.findByAuthority("USER");
+        Optional<Role> fromRepo = toTest.findByAuthority("USER");
 
-        verify(roleRepo).findByAuthority(captor.capture());
+        verify(toTest).findByAuthority(captor.capture());
 
         String expectedParam = captor.getValue();
 
@@ -130,19 +161,13 @@ class RoleRepoTest {
     void findAll(){
         final List<Role> expectedRoles = Arrays.asList(expectedRole);
 
-        given(roleRepo.findAll()).willReturn(expectedRoles);
+        given(toTest.findAll()).willReturn(expectedRoles);
 
-        List<Role> fromRepo = roleRepo.findAll();
+        List<Role> fromRepo = toTest.findAll();
 
-        verify(roleRepo).findAll();
+        verify(toTest).findAll();
 
         assertEquals(expectedRoles, fromRepo);
-    }
-
-    private void assertRoleFields(Role expected) {
-        assertEquals(1, expected.getId());
-        assertEquals("USER", expected.getAuthority());
-        assertEquals(Arrays.asList(this.testUser), expected.getUsers());
     }
 
 }
