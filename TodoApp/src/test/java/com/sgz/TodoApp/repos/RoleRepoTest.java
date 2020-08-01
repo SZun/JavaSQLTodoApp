@@ -125,7 +125,7 @@ class RoleRepoTest {
     }
 
     @Test
-    void findByAuthority(){
+    void findByAuthorityEmpty(){
         given(toTest.findByAuthority(anyString())).willReturn(Optional.empty());
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
@@ -141,7 +141,7 @@ class RoleRepoTest {
     }
 
     @Test
-    void findByAuthorityEmpty(){
+    void findByAuthority(){
         given(toTest.findByAuthority(anyString())).willReturn(Optional.of(expectedRole));
 
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
