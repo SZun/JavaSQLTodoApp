@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.Todo;
 import com.sgz.TodoApp.entities.User;
+import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.jwt.JwtConfig;
@@ -132,6 +133,25 @@ class TodoControllerTest {
 
     @Test
     @WithMockUser
+    void getByIdInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(authService.getUserId()).thenReturn(id);
+        when(todoService.getTodoById(any(UUID.class), any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/" + testUUIDStr))
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
     void deleteById() throws Exception {
         when(authService.getUserId()).thenReturn(id);
 
@@ -182,6 +202,31 @@ class TodoControllerTest {
 
     @Test
     @WithMockUser
+    void addTodoInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+        final String toEditStr = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
+
+        when(authService.getUserId()).thenReturn(id);
+        when(todoService.createTodo(any(Todo.class), any(UUID.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURL)
+                        .content(toEditStr)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
     void updateTodo() throws Exception {
         final String expected = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
 
@@ -198,6 +243,56 @@ class TodoControllerTest {
 
         String content = mvcResult.getResponse().getContentAsString();
         assertEquals(expected, content);
+    }
+
+    @Test
+    @WithMockUser
+    void updateTodoInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+        final String toEditStr = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
+
+        when(authService.getUserId()).thenReturn(id);
+        when(todoService.editTodo(any(Todo.class), any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/" + testUUIDStr)
+                        .content(toEditStr)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser
+    void updateTodoInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+        final String toEditStr = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
+
+        when(authService.getUserId()).thenReturn(id);
+        when(todoService.editTodo(any(Todo.class), any(UUID.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/" + testUUIDStr)
+                        .content(toEditStr)
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
