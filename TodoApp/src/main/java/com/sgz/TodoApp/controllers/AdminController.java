@@ -16,13 +16,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1/admin/")
+@RequestMapping("/api/v1/admin")
 public class AdminController {
 
     @Autowired
@@ -34,50 +31,50 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
-    @PutMapping("users/{id}/roles")
+    @PutMapping("/users/{id}/roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<User> editUserRoles(@PathVariable int id, @RequestBody Set<Integer> roleIds) throws InvalidIdException, InvalidEntityException {
+    public ResponseEntity<User> editUserRoles(@PathVariable UUID id, @RequestBody Set<UUID> roleIds) throws InvalidIdException, InvalidEntityException {
         User toEdit = userService.getUserById(id);
         Set<Role> roles = new HashSet<>();
-        for (Integer roleId : roleIds) {
+        for (UUID roleId : roleIds) {
             roles.add(roleService.getRoleById(roleId));
         }
         return ResponseEntity.ok(adminService.updateUserRoles(toEdit));
     }
 
-    @PutMapping("roles/{id}/users")
+    @PutMapping("/roles/{id}/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> updateRolesUsers(@PathVariable int id, @RequestBody List<Integer> userIds) throws InvalidIdException, InvalidEntityException {
+    public ResponseEntity<Role> updateRolesUsers(@PathVariable UUID id, @RequestBody List<UUID> userIds) throws InvalidIdException, InvalidEntityException {
         Role toEdit = roleService.getRoleById(id);
         List<User> users = new ArrayList<>();
-        for (Integer userId : userIds) {
+        for (UUID userId : userIds) {
             users.add(userService.getUserById(userId));
         }
         return ResponseEntity.ok(adminService.updateRoleUsers(toEdit));
     }
 
-    @GetMapping("roles")
+    @GetMapping("/roles")
     public ResponseEntity<List<Role>> getAllRoles() throws NoItemsException {
         return ResponseEntity.ok(roleService.getAllRoles());
     }
 
-    @GetMapping("roles/{id}")
+    @GetMapping("/roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> getRoleById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<Role> getRoleById(@PathVariable UUID id) throws InvalidIdException {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
-    @PostMapping("roles")
+    @PostMapping("/roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> createRole(@Valid @RequestBody Role toAdd) throws InvalidEntityException, InvalidAuthorityException {
         return new ResponseEntity(roleService.createRole(toAdd), HttpStatus.CREATED);
     }
-    @PutMapping("roles/{id}")
+    @PutMapping("/roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> editRole(@PathVariable int id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
+    public ResponseEntity<Role> editRole(@PathVariable UUID id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
         try {
             Role toCheck = roleService.getRoleByAuthority(toEdit.getAuthority());
-            if(toCheck.getId() != id){
+            if(!toCheck.getId().equals(id)){
                 return new ResponseEntity(HttpStatus.BAD_REQUEST);
             }
         } catch(InvalidAuthorityException | InvalidEntityException ex){}
@@ -85,9 +82,9 @@ public class AdminController {
         return ResponseEntity.ok(roleService.editRole(toEdit));
     }
 
-    @DeleteMapping("roles/{id}")
+    @DeleteMapping("/roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Integer> deleteRoleById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<UUID> deleteRoleById(@PathVariable UUID id) throws InvalidIdException {
         roleService.deleteRoleById(id);
         return ResponseEntity.ok(id);
     }

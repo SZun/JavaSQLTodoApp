@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * @author samg.zun
@@ -30,7 +31,7 @@ public class TodoService {
         this.todoRepo = todoRepo;
     }
 
-    public List<Todo> getAllTodos(int userId) throws NoItemsException {
+    public List<Todo> getAllTodos(UUID userId) throws NoItemsException {
         List<Todo> allTodos = todoRepo.findAllByUser_Id(userId);
 
         if (allTodos.isEmpty()) throw new NoItemsException("No Items");
@@ -38,7 +39,7 @@ public class TodoService {
         return allTodos;
     }
 
-    public Todo getTodoById(int id, int userId) throws InvalidIdException {
+    public Todo getTodoById(UUID id, UUID userId) throws InvalidIdException {
         Optional<Todo> toGet = todoRepo.findByIdAndUser_Id(id, userId);
 
         if (!toGet.isPresent()) throw new InvalidIdException("Invalid Id");
@@ -46,7 +47,7 @@ public class TodoService {
         return toGet.get();
     }
 
-    public Todo createTodo(Todo toAdd, int userId) throws InvalidEntityException {
+    public Todo createTodo(Todo toAdd, UUID userId) throws InvalidEntityException {
         validateTodo(toAdd);
         toAdd.getUser().setId(userId);
         toAdd.setEndDate(null);
@@ -54,7 +55,7 @@ public class TodoService {
         return todoRepo.save(toAdd);
     }
 
-    public Todo editTodo(Todo toEdit, int userId) throws InvalidEntityException, InvalidIdException {
+    public Todo editTodo(Todo toEdit, UUID userId) throws InvalidEntityException, InvalidIdException {
         validateTodo(toEdit);
         checkExists(toEdit.getId(), userId);
 
@@ -62,12 +63,12 @@ public class TodoService {
         return todoRepo.save(toEdit);
     }
 
-    public void deleteTodoById(int id, int userId) throws InvalidIdException {
+    public void deleteTodoById(UUID id, UUID userId) throws InvalidIdException {
         checkExists(id, userId);
         todoRepo.deleteById(id);
     }
 
-    private void checkExists(int id, int userId) throws InvalidIdException {
+    private void checkExists(UUID id, UUID userId) throws InvalidIdException {
         if (!todoRepo.existsByIdAndUser_Id(id, userId)) throw new InvalidIdException("Invalid Id");
     }
 

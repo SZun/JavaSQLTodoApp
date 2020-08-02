@@ -16,10 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.nio.file.AccessDeniedException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -37,11 +34,13 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    private final User testUser = new User(1, "@amBam20", "Sam");
+    private final UUID id = new UUID(36,36);
 
-    private final Set<Role>  testRoles = Sets.newHashSet(Sets.newHashSet(new Role(1, "USER")));
+    private final User testUser = new User(id, "@amBam20", "Sam");
 
-    private final User expectedUser = new User(1, "@amBam20", "Sam", this.testRoles);
+    private final Set<Role>  testRoles = Sets.newHashSet(Sets.newHashSet(new Role(id, "USER")));
+
+    private final User expectedUser = new User(id, "@amBam20", "Sam", this.testRoles);
 
     private final String testLongString = "1ZvBWFVdBu62e6yT87rdELXaLP6KfY2wJ9ZRpw9KmZqzNFICvlNKgkCU28aKRpQb2I85EqAxr6Xb4A1Ct4yNEjTOAXgNyyIBEyTnjOYyN4piLPot1OYtnNftyVXZg6DSxlAGgYzBa5ATYzkSHo2EmIpNyc0NCXvFtPdwP1N30s1Fn63sBaQGdX8sZffYO29yTVtg4LLYRdrrP8aPmL2Pm3c3XySoA7KLLNIi8417yXnjzgdDQErkKiAuoR5REsdL";
 
@@ -127,8 +126,8 @@ class UserServiceTest {
 
     @Test
     void getAllUsers() throws NoItemsException {
-        final User expected2 = new User(1, "@amBam22", "Sam2", testRoles);
-        final User expected3 = new User(1, "@amBam23", "Sam3", testRoles);
+        final User expected2 = new User(id, "@amBam22", "Sam2", testRoles);
+        final User expected3 = new User(id, "@amBam23", "Sam3", testRoles);
 
         when(userRepo.findAll()).thenReturn(Arrays.asList(expectedUser, expected2, expected3));
 
@@ -181,116 +180,116 @@ class UserServiceTest {
 
     @Test
     void editUser() throws InvalidEntityException, InvalidIdException, AccessDeniedException {
-        final User toEdit = new User(1, "@amBam25", "Test_User", testRoles);
+        final User toEdit = new User(id, "@amBam25", "Test_User", testRoles);
 
-        when(userRepo.existsById(anyInt())).thenReturn(true);
+        when(userRepo.existsById(any(UUID.class))).thenReturn(true);
         when(passwordEncoder.encode(anyString())).thenReturn(toEdit.getPassword());
         when(userRepo.save(any())).thenReturn(testUser);
 
-        User fromService = toTest.editUser(toEdit, 1);
+        User fromService = toTest.editUser(toEdit, id);
 
         assertEquals(testUser, fromService);
     }
 
     @Test
     void editUserNullUser() {
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(null,1));
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(null,id));
     }
 
     @Test
     void editUserEmptyUsername() {
-        final User toEdit = new User(1, "@amBam25", "", testRoles);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "@amBam25", "", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserBlankUsername() {
-        final User toEdit = new User(1, "@amBam25", "   ", testRoles);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "@amBam25", "   ", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserTooLongUsername() {
-        final User toEdit = new User(1, "@amBam25", testLongString, testRoles);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "@amBam25", testLongString, testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserEmptyPassword() {
-        final User toEdit = new User(1, "", "Sam", testRoles);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserBlankPassword() {
-        final User toEdit = new User(1, "  ", "Sam", testRoles);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "  ", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserTooLongPassword() {
-        final User toEdit = new User(1, testLongString, "Sam", testRoles);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, testLongString, "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserInvalidPassword() {
-        final User toEdit = new User(1, "password", "Sam", testRoles);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "password", "Sam", testRoles);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserInvalidId() {
-        final User toEdit = new User(1, "@amBam20", "Sam", testRoles);
-        assertThrows(InvalidIdException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "@amBam20", "Sam", testRoles);
+        assertThrows(InvalidIdException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserNullRoles() {
-        final User toEdit = new User(1, "@amBam20", "Sam", null);
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "@amBam20", "Sam", null);
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserEmptyRoles() {
-        final User toEdit = new User(1, "@amBam20", "Sam", Sets.newHashSet());
-        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, 1));
+        final User toEdit = new User(id, "@amBam20", "Sam", Sets.newHashSet());
+        assertThrows(InvalidEntityException.class, () -> toTest.editUser(toEdit, id));
     }
 
     @Test
     void editUserAccessDenied() {
-        final User toEdit = new User(1, "@amBam20", "Sam", testRoles);
-        assertThrows(AccessDeniedException.class, () -> toTest.editUser(toEdit, 2));
+        final User toEdit = new User(id, "@amBam20", "Sam", testRoles);
+        assertThrows(AccessDeniedException.class, () -> toTest.editUser(toEdit, UUID.randomUUID()));
     }
 
     @Test
     void getUserById() throws InvalidIdException {
-        when(userRepo.findById(anyInt())).thenReturn(Optional.of(expectedUser));
+        when(userRepo.findById(any(UUID.class))).thenReturn(Optional.of(expectedUser));
 
-        User fromService = toTest.getUserById(1);
+        User fromService = toTest.getUserById(id);
 
         assertEquals(expectedUser, fromService);
     }
 
     @Test
     void getUserByIdInvalidId() {
-        assertThrows(InvalidIdException.class, () -> toTest.getUserById(1));
+        assertThrows(InvalidIdException.class, () -> toTest.getUserById(id));
     }
 
     @Test
     void deleteUserById() throws InvalidIdException, AccessDeniedException {
-        when(userRepo.existsById(anyInt())).thenReturn(true);
+        when(userRepo.existsById(any(UUID.class))).thenReturn(true);
 
-        toTest.deleteUserById(1,1);
+        toTest.deleteUserById(id,id);
     }
 
     @Test
     void deleteUserByIdInvalidId() {
-        assertThrows(InvalidIdException.class, () -> toTest.deleteUserById(1,1));
+        assertThrows(InvalidIdException.class, () -> toTest.deleteUserById(id,id));
     }
 
     @Test
     void deleteUserByIdAccessDenied() {
-        assertThrows(AccessDeniedException.class, () -> toTest.deleteUserById(1,2));
+        assertThrows(AccessDeniedException.class, () -> toTest.deleteUserById(id, UUID.randomUUID()));
     }
 }

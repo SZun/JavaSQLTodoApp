@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.User;
+import com.sgz.TodoApp.exceptions.InvalidAuthorityException;
+import com.sgz.TodoApp.exceptions.InvalidEntityException;
 import com.sgz.TodoApp.exceptions.InvalidIdException;
 import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.jwt.JwtConfig;
@@ -26,6 +28,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import javax.crypto.SecretKey;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,57 +70,153 @@ class AdminControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final String baseURL = "/api/v1/admin/";
+    private final String baseURL = "/api/v1/admin";
 
-    private final User testUser = new User(1, "@amBam20", "Sam");
+    private final UUID id = new UUID(36, 36);
 
-    private final Role testRole = new Role(1, "USER");
+    private String testUUIDStr = "11a9c792-45c5-4220-ab7c-fb832b282911";
 
-    private final Role expectedRole = new Role(1, "USER", Arrays.asList(this.testUser));
+    private final User testUser = new User(id, "@amBam20", "Sam");
 
-    private final User expectedUser = new User(1, "@amBam20", "Sam", Sets.newHashSet(testRole));
+    private final Role testRole = new Role(id, "USER");
+
+    private final Role expectedRole = new Role(id, "USER", Arrays.asList(this.testUser));
+
+    private final User expectedUser = new User(id, "@amBam20", "Sam", Sets.newHashSet(testRole));
 
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void editUserRoles() throws Exception {
-        when(userService.getUserById(anyInt())).thenReturn(expectedUser);
-        when(roleService.getRoleById(anyInt())).thenReturn(expectedRole);
+        when(userService.getUserById(any(UUID.class))).thenReturn(expectedUser);
+        when(roleService.getRoleById(any(UUID.class))).thenReturn(expectedRole);
         when(adminService.updateUserRoles(any(User.class))).thenReturn(expectedUser);
 
         MvcResult mvcResult = mockMvc.perform(
-                put(baseURL + "users/1/roles")
-                        .content(objectMapper.writeValueAsString(Sets.newHashSet(1,1,1)))
+                put(baseURL + "/users/"+ testUUIDStr +"/roles")
+                        .content(objectMapper.writeValueAsString(Sets.newHashSet(id, id, id)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":1,\"password\":\"@amBam20\",\"username\":\"Sam\"}", content);
+        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\"}", content);
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void editUserRolesInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(userService.getUserById(any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/users/"+ testUUIDStr +"/roles")
+                        .content(objectMapper.writeValueAsString(Sets.newHashSet(id, id, id)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void editUserRolesInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(userService.getUserById(any(UUID.class))).thenReturn(expectedUser);
+        when(roleService.getRoleById(any(UUID.class))).thenReturn(expectedRole);
+        when(adminService.updateUserRoles(any(User.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/users/"+ testUUIDStr +"/roles")
+                        .content(objectMapper.writeValueAsString(Sets.newHashSet(id, id, id)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void updateRolesUsers() throws Exception {
-        when(userService.getUserById(anyInt())).thenReturn(expectedUser);
-        when(roleService.getRoleById(anyInt())).thenReturn(expectedRole);
+        when(userService.getUserById(any(UUID.class))).thenReturn(expectedUser);
+        when(roleService.getRoleById(any(UUID.class))).thenReturn(expectedRole);
         when(adminService.updateRoleUsers(any(Role.class))).thenReturn(expectedRole);
 
         MvcResult mvcResult = mockMvc.perform(
-                put(baseURL + "roles/1/users")
-                        .content(objectMapper.writeValueAsString(Arrays.asList(1,1,1)))
+                put(baseURL + "/roles/"+ testUUIDStr +"/users")
+                        .content(objectMapper.writeValueAsString(Arrays.asList(id, id, id)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":1,\"authority\":\"USER\"}", content);
+        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}", content);
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void updateRolesUsersInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(roleService.getRoleById(any(UUID.class))).thenThrow(new InvalidIdException("Invalid Id"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/roles/"+ testUUIDStr +"/users")
+                        .content(objectMapper.writeValueAsString(Arrays.asList(id, id, id)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void updateRolesUsersInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(userService.getUserById(any(UUID.class))).thenReturn(expectedUser);
+        when(roleService.getRoleById(any(UUID.class))).thenReturn(expectedRole);
+        when(adminService.updateRoleUsers(any(Role.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/roles/"+ testUUIDStr +"/users")
+                        .content(objectMapper.writeValueAsString(Arrays.asList(id, id, id)))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     void editUserRolesForbidden() throws Exception {
         mockMvc.perform(
-                put(baseURL + "users/1/roles")
-                        .content(objectMapper.writeValueAsString(Sets.newHashSet(1,1,1)))
+                put(baseURL + "users/" + testUUIDStr + "/roles")
+                        .content(objectMapper.writeValueAsString(Sets.newHashSet(id, id, id)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -125,8 +224,8 @@ class AdminControllerTest {
     @Test
     void updateRolesUsersForbidden() throws Exception {
         mockMvc.perform(
-                put(baseURL + "roles/1/users")
-                        .content(objectMapper.writeValueAsString(Arrays.asList(1,1,1)))
+                put(baseURL + "/roles/" + testUUIDStr + "/users")
+                        .content(objectMapper.writeValueAsString(Arrays.asList(id, id, id)))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
@@ -134,13 +233,13 @@ class AdminControllerTest {
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void getAllRoles() throws Exception {
-        final String expected = "[{\"id\":1,\"authority\":\"USER\"},{\"id\":2,\"authority\":\"ADMIN\"},{\"id\":3,\"authority\":\"GUEST\"}]";
+        final String expected = "[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"},{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"ADMIN\"},{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"GUEST\"}]";
 
         when(roleService.getAllRoles()).thenReturn(
-                Arrays.asList(expectedRole, new Role(2, "ADMIN"), new Role(3, "GUEST")
+                Arrays.asList(expectedRole, new Role(id, "ADMIN"), new Role(id, "GUEST")
                 ));
 
-        MvcResult mvcResult = mockMvc.perform(get(baseURL + "roles"))
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/roles"))
                 .andExpect(status().isOk()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -155,9 +254,9 @@ class AdminControllerTest {
         final String expectedName = "\"name\":\"NoItemsException\",";
         final String expectedErrors = "\"errors\":null,\"timestamp\"";
 
-        when(mockMvc.perform(get(baseURL + "roles"))).thenThrow(new NoItemsException("No Items"));
+        when(mockMvc.perform(get(baseURL + "/roles"))).thenThrow(new NoItemsException("No Items"));
 
-        MvcResult mvcResult = mockMvc.perform(get(baseURL + "roles"))
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/roles"))
                 .andExpect(status().isUnprocessableEntity()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -169,21 +268,21 @@ class AdminControllerTest {
 
     @Test
     void getAllRolesForbidden() throws Exception {
-        mockMvc.perform(get(baseURL + "roles"))
+        mockMvc.perform(get(baseURL + "/roles"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void getRoleById() throws Exception {
-        when(roleService.getRoleById(anyInt())).thenReturn(expectedRole);
+        when(roleService.getRoleById(any(UUID.class))).thenReturn(expectedRole);
 
-        MvcResult mvcResult = mockMvc.perform(get(baseURL + "roles/1"))
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/roles/" + testUUIDStr))
                 .andExpect(status().isOk()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
 
-        assertEquals("{\"id\":1,\"authority\":\"USER\"}", content);
+        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}", content);
     }
 
     @Test
@@ -193,9 +292,9 @@ class AdminControllerTest {
         final String expectedName = "\"name\":\"InvalidIdException\",";
         final String expectedErrors = "\"errors\":null,\"timestamp\"";
 
-        when(mockMvc.perform(get(baseURL + "roles/1"))).thenThrow(new InvalidIdException("Invalid Id"));
+        when(mockMvc.perform(get(baseURL + "/roles/" + testUUIDStr))).thenThrow(new InvalidIdException("Invalid Id"));
 
-        MvcResult mvcResult = mockMvc.perform(get(baseURL + "roles/1"))
+        MvcResult mvcResult = mockMvc.perform(get(baseURL + "/roles/" + testUUIDStr))
                 .andExpect(status().isUnprocessableEntity()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -207,7 +306,7 @@ class AdminControllerTest {
 
     @Test
     void getAllRoleByIdForbidden() throws Exception {
-         mockMvc.perform(get(baseURL + "roles/1"))
+        mockMvc.perform(get(baseURL + "/roles/" + testUUIDStr))
                 .andExpect(status().isForbidden());
     }
 
@@ -217,20 +316,64 @@ class AdminControllerTest {
         when(roleService.createRole(any(Role.class))).thenReturn(expectedRole);
 
         MvcResult mvcResult = mockMvc.perform(
-                post(baseURL + "roles")
-                    .content(objectMapper.writeValueAsString(testRole))
-                    .contentType(MediaType.APPLICATION_JSON))
+                post(baseURL + "/roles")
+                        .content(objectMapper.writeValueAsString(testRole))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":1,\"authority\":\"USER\"}", content);
+        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}", content);
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void createRoleInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(roleService.createRole(any(Role.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURL + "/roles")
+                        .content(objectMapper.writeValueAsString(testRole))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void createRoleInvalidAuthority() throws Exception {
+        final String expectedMsg = "\"message\":\"Authority entered is invalid\",";
+        final String expectedName = "\"name\":\"InvalidAuthorityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(roleService.createRole(any(Role.class))).thenThrow(new InvalidAuthorityException("Invalid Authority"));
+
+        MvcResult mvcResult = mockMvc.perform(
+                post(baseURL + "/roles")
+                        .content(objectMapper.writeValueAsString(testRole))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     void createRoleForbidden() throws Exception {
         mockMvc.perform(
-                post(baseURL + "roles")
+                post(baseURL + "/roles")
                         .content(objectMapper.writeValueAsString(testRole))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
@@ -243,33 +386,79 @@ class AdminControllerTest {
         when(roleService.getRoleByAuthority(anyString())).thenReturn(expectedRole);
 
         MvcResult mvcResult = mockMvc.perform(
-                put(baseURL + "roles/1")
+                put(baseURL + "/roles/" + id.toString())
                         .content(objectMapper.writeValueAsString(testRole))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":1,\"authority\":\"USER\"}", content);
+        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}", content);
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void editRoleInvalidId() throws Exception {
+        final String expectedMsg = "\"message\":\"Invalid Id\",";
+        final String expectedName = "\"name\":\"InvalidIdException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(roleService.editRole(any(Role.class))).thenThrow(new InvalidIdException("Invalid Id"));
+        when(roleService.getRoleByAuthority(anyString())).thenReturn(expectedRole);
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/roles/" + id.toString())
+                        .content(objectMapper.writeValueAsString(testRole))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
+    }
+
+    @Test
+    @WithMockUser(value = "Sam", roles = {"ADMIN"})
+    void editRoleInvalidEntity() throws Exception {
+        final String expectedMsg = "\"message\":\"Fields entered are invalid\",";
+        final String expectedName = "\"name\":\"InvalidEntityException\",";
+        final String expectedErrors = "\"errors\":null,\"timestamp\"";
+
+        when(roleService.editRole(any(Role.class))).thenThrow(new InvalidEntityException("Invalid Entity"));
+        when(roleService.getRoleByAuthority(anyString())).thenReturn(expectedRole);
+
+        MvcResult mvcResult = mockMvc.perform(
+                put(baseURL + "/roles/" + id.toString())
+                        .content(objectMapper.writeValueAsString(testRole))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        assertTrue(content.contains(expectedMsg));
+        assertTrue(content.contains(expectedName));
+        assertTrue(content.contains(expectedErrors));
     }
 
     @Test
     void editRoleForbidden() throws Exception {
         mockMvc.perform(
-                put(baseURL + "roles/1")
+                put(baseURL + "/roles/" + testUUIDStr)
                         .content(objectMapper.writeValueAsString(testRole))
                         .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void deleteRoleById() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "roles/1"))
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "/roles/" + testUUIDStr))
                 .andExpect(status().isOk()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("1", content);
+        assertEquals("\"11a9c792-45c5-4220-ab7c-fb832b282911\"", content);
     }
 
     @Test
@@ -280,9 +469,9 @@ class AdminControllerTest {
         final String expectedErrors = "\"errors\":null,\"timestamp\"";
 
 
-        when(mockMvc.perform(delete(baseURL + "roles/1"))).thenThrow(new InvalidIdException("Invalid Id"));
+        when(mockMvc.perform(delete(baseURL + "/roles/" + testUUIDStr))).thenThrow(new InvalidIdException("Invalid Id"));
 
-        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "roles/1"))
+        MvcResult mvcResult = mockMvc.perform(delete(baseURL + "/roles/" + testUUIDStr))
                 .andExpect(status().isUnprocessableEntity()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
@@ -293,7 +482,7 @@ class AdminControllerTest {
 
     @Test
     void deleteRoleByIdForbidden() throws Exception {
-        mockMvc.perform(delete(baseURL + "roles/1"))
+        mockMvc.perform(delete(baseURL + "/roles/" + testUUIDStr))
                 .andExpect(status().isForbidden());
     }
 }

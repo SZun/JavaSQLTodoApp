@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @JsonIgnoreProperties("users")
 @Data
@@ -20,7 +21,7 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private UUID id = UUID.randomUUID();
 
     @NotBlank(message = "Please enter a role")
     @Size(max = 50, message = "Role title cannot be more than 50 characters")
@@ -31,7 +32,7 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private List<User> users = new ArrayList<>();
 
-    public Role(int id, String authority) {
+    public Role(UUID id, String authority) {
         this.id = id;
         this.authority = authority;
     }

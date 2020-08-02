@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class AuthService {
 
@@ -15,7 +17,7 @@ public class AuthService {
         this.userRepo = userRepo;
     }
 
-    public int getUserId() {
+    public UUID getUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepo.findByUsername(username).get().getId();
     }

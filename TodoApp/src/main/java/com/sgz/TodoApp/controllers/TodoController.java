@@ -19,12 +19,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author samg.zun
  */
 @RestController
-@RequestMapping("/api/v1/todos/")
+@RequestMapping("/api/v1/todos")
 public class TodoController {
 
     @Autowired
@@ -39,15 +40,15 @@ public class TodoController {
         return ResponseEntity.ok(todoService.getAllTodos(authService.getUserId()));
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Todo> getById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<Todo> getById(@PathVariable UUID id) throws InvalidIdException {
         return ResponseEntity.ok(todoService.getTodoById(id, authService.getUserId()));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity deleteById(@PathVariable int id) throws InvalidIdException {
+    public ResponseEntity<UUID> deleteById(@PathVariable UUID id) throws InvalidIdException {
         todoService.deleteTodoById(id, authService.getUserId());
         return ResponseEntity.ok(id);
     }
@@ -58,9 +59,9 @@ public class TodoController {
         return new ResponseEntity(todoService.createTodo(toAdd, authService.getUserId()), HttpStatus.CREATED);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Todo> updateTodo(@PathVariable int id, @Valid @RequestBody Todo toEdit) throws InvalidEntityException, InvalidIdException {
+    public ResponseEntity<Todo> updateTodo(@PathVariable UUID id, @Valid @RequestBody Todo toEdit) throws InvalidEntityException, InvalidIdException {
         toEdit.setId(id);
         return ResponseEntity.ok(todoService.editTodo(toEdit, authService.getUserId()));
     }

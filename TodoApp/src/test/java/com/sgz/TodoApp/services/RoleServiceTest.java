@@ -1,6 +1,5 @@
 package com.sgz.TodoApp.services;
 
-import com.google.common.collect.Sets;
 import com.sgz.TodoApp.entities.Role;
 import com.sgz.TodoApp.entities.User;
 import com.sgz.TodoApp.exceptions.InvalidAuthorityException;
@@ -17,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -31,18 +31,20 @@ class RoleServiceTest {
     @Mock
     private RoleRepo roleRepo;
 
-    private final User testUser = new User(1, "@amBam20", "Sam");
+    private final UUID id = new UUID(36,36);
 
-    private final Role testRole = new Role(1, "USER");
+    private final User testUser = new User(id, "@amBam20", "Sam");
 
-    private final Role expectedRole = new Role(1, "USER", Arrays.asList(this.testUser));
+    private final Role testRole = new Role(id, "USER");
+
+    private final Role expectedRole = new Role(id, "USER", Arrays.asList(this.testUser));
 
     private final String testLongString = "1ZvBWFVdBu62e6yT87rdELXaLP6KfY2wJ9ZRpw9KmZqzNFICvlNKgkCU28aKRpQb2I85EqAxr6Xb4A1Ct4yNEjTOAXgNyyIBEyTnjOYyN4piLPot1OYtnNftyVXZg6DSxlAGgYzBa5ATYzkSHo2EmIpNyc0NCXvFtPdwP1N30s1Fn63sBaQGdX8sZffYO29yTVtg4LLYRdrrP8aPmL2Pm3c3XySoA7KLLNIi8417yXnjzgdDQErkKiAuoR5REsdL";
 
     @Test
     void getAllRoles() throws NoItemsException {
-        final Role expected2 = new Role(2, "ADMIN", Arrays.asList(testUser));
-        final Role expected3 = new Role(3, "GUEST", Arrays.asList(testUser));
+        final Role expected2 = new Role(id, "ADMIN", Arrays.asList(testUser));
+        final Role expected3 = new Role(id, "GUEST", Arrays.asList(testUser));
 
         when(roleRepo.findAll()).thenReturn(Arrays.asList(expectedRole, expected2, expected3));
 
@@ -61,16 +63,16 @@ class RoleServiceTest {
 
     @Test
     void getRoleById() throws InvalidIdException {
-        when(roleRepo.findById(anyInt())).thenReturn(Optional.of(expectedRole));
+        when(roleRepo.findById(any(UUID.class))).thenReturn(Optional.of(expectedRole));
 
-        Role fromService = toTest.getRoleById(1);
+        Role fromService = toTest.getRoleById(id);
 
         assertEquals(expectedRole, fromService);
     }
 
     @Test
     void getRoleByIdInvalidId() {
-        assertThrows(InvalidIdException.class, () -> toTest.getRoleById(1));
+        assertThrows(InvalidIdException.class, () -> toTest.getRoleById(id));
     }
 
     @Test
@@ -152,7 +154,7 @@ class RoleServiceTest {
 
     @Test
     void editRole() throws InvalidEntityException, InvalidIdException {
-        when(roleRepo.existsById(anyInt())).thenReturn(true);
+        when(roleRepo.existsById(any(UUID.class))).thenReturn(true);
         when(roleRepo.save(testRole)).thenReturn(testRole);
 
         Role fromService = toTest.editRole(testRole);
@@ -167,36 +169,36 @@ class RoleServiceTest {
 
     @Test
     void editRoleEmptyAuthority()  {
-        final Role toEdit = new Role(1, "");
+        final Role toEdit = new Role(id, "");
         assertThrows(InvalidEntityException.class, () -> toTest.editRole(toEdit));
     }
 
     @Test
     void editRoleBlankAuthority()  {
-        final Role toEdit = new Role(1, "  ");
+        final Role toEdit = new Role(id, "  ");
         assertThrows(InvalidEntityException.class, () -> toTest.editRole(toEdit));
     }
 
     @Test
     void editRoleTooLongAuthority()  {
-        final Role toEdit = new Role(1, testLongString);
+        final Role toEdit = new Role(id, testLongString);
         assertThrows(InvalidEntityException.class, () -> toTest.editRole(toEdit));
     }
 
     @Test
     void editRoleInvalidId() {
-        final Role toEdit = new Role(1, "USER");
+        final Role toEdit = new Role(id, "USER");
         assertThrows(InvalidIdException.class, () -> toTest.editRole(toEdit));
     }
 
     @Test
     void deleteRoleById() throws InvalidIdException {
-        when(roleRepo.existsById(anyInt())).thenReturn(true);
-        toTest.deleteRoleById(1);
+        when(roleRepo.existsById(any(UUID.class))).thenReturn(true);
+        toTest.deleteRoleById(id);
     }
 
     @Test
     void deleteRoleByIdInvalidId() {
-        assertThrows(InvalidIdException.class, () -> toTest.deleteRoleById(1));
+        assertThrows(InvalidIdException.class, () -> toTest.deleteRoleById(id));
     }
 }

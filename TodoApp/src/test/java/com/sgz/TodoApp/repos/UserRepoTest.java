@@ -9,10 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,9 +23,11 @@ class UserRepoTest {
     @Mock
     private UserRepo toTest;
 
-    private final Set<Role> testRoles = Sets.newHashSet(Sets.newHashSet(new Role(1, "USER")));
+    private final UUID id = new UUID(36,36);
 
-    private final User expectedUser = new User(1, "@amBam20", "Sam", this.testRoles);
+    private final Set<Role> testRoles = Sets.newHashSet(Sets.newHashSet(new Role(this.id, "USER")));
+
+    private final User expectedUser = new User(this.id, "@amBam20", "Sam", this.testRoles);
 
     @Test
     void save(){
@@ -41,7 +40,7 @@ class UserRepoTest {
         verify(toTest).save(captor.capture());
 
         User expectedParam = captor.getValue();
-        assertEquals(1, expectedParam.getId());
+        assertEquals(id, expectedParam.getId());
         assertEquals("@amBam20", expectedParam.getPassword());
         assertEquals("Sam", expectedParam.getUsername());
         assertEquals(testRoles, expectedParam.getRoles());
@@ -84,48 +83,48 @@ class UserRepoTest {
 
     @Test
     void findById(){
-        given(toTest.findById(anyInt())).willReturn(Optional.of(expectedUser));
+        given(toTest.findById(any(UUID.class))).willReturn(Optional.of(expectedUser));
 
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        Optional<User> fromRepo = toTest.findById(1);
+        Optional<User> fromRepo = toTest.findById(id);
 
         verify(toTest).findById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
         assertTrue(fromRepo.isPresent());
         assertEquals(expectedUser, fromRepo.get());
     }
 
     @Test
     void findByIdEmpty(){
-        given(toTest.findById(anyInt())).willReturn(Optional.empty());
+        given(toTest.findById(any(UUID.class))).willReturn(Optional.empty());
 
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        Optional<User> fromRepo = toTest.findById(1);
+        Optional<User> fromRepo = toTest.findById(id);
 
         verify(toTest).findById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
         assertTrue(fromRepo.isEmpty());
     }
 
     @Test
     void deleteById(){
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        toTest.deleteById(1);
+        toTest.deleteById(id);
 
         verify(toTest).deleteById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
     }
 
     @Test
@@ -159,17 +158,17 @@ class UserRepoTest {
 
     @Test
     void existsById(){
-        given(toTest.existsById(anyInt())).willReturn(true);
+        given(toTest.existsById(any(UUID.class))).willReturn(true);
 
-        ArgumentCaptor<Integer> captor = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<UUID> captor = ArgumentCaptor.forClass(UUID.class);
 
-        boolean fromRepo = toTest.existsById(1);
+        boolean fromRepo = toTest.existsById(id);
 
         verify(toTest).existsById(captor.capture());
 
-        Integer expectedParam = captor.getValue();
+        UUID expectedParam = captor.getValue();
 
-        assertEquals(1, expectedParam);
+        assertEquals(id, expectedParam);
         assertTrue(fromRepo);
     }
 

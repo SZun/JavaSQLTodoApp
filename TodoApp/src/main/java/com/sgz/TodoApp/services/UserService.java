@@ -1,7 +1,10 @@
 package com.sgz.TodoApp.services;
 
 import com.sgz.TodoApp.entities.User;
-import com.sgz.TodoApp.exceptions.*;
+import com.sgz.TodoApp.exceptions.InvalidEntityException;
+import com.sgz.TodoApp.exceptions.InvalidIdException;
+import com.sgz.TodoApp.exceptions.InvalidNameException;
+import com.sgz.TodoApp.exceptions.NoItemsException;
 import com.sgz.TodoApp.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -57,7 +61,7 @@ public class UserService {
         return toGet.get();
     }
 
-    public User editUser(User toEdit, int authId) throws InvalidEntityException, InvalidIdException, AccessDeniedException {
+    public User editUser(User toEdit, UUID authId) throws InvalidEntityException, InvalidIdException, AccessDeniedException {
         validate(toEdit);
         checkAuthorization(toEdit.getId(), authId);
         checkExists(toEdit.getId());
@@ -67,7 +71,7 @@ public class UserService {
         return userRepo.save(toEdit);
     }
 
-    public User getUserById(int id) throws InvalidIdException {
+    public User getUserById(UUID id) throws InvalidIdException {
         Optional<User> toGet = userRepo.findById(id);
 
         if (!toGet.isPresent()) {
@@ -77,7 +81,7 @@ public class UserService {
         return toGet.get();
     }
 
-    public void deleteUserById(int writeId, int authId) throws InvalidIdException, AccessDeniedException {
+    public void deleteUserById(UUID writeId, UUID authId) throws InvalidIdException, AccessDeniedException {
         checkAuthorization(writeId, authId);
         checkExists(writeId);
         userRepo.deleteById(writeId);
@@ -87,12 +91,12 @@ public class UserService {
         if (userRepo.existsByUsername(username)) throw new InvalidNameException("Name already exists");
     }
 
-    private void checkExists(int id) throws InvalidIdException {
+    private void checkExists(UUID id) throws InvalidIdException {
         if (!userRepo.existsById(id)) throw new InvalidIdException("Invalid Id");
     }
 
-    private void checkAuthorization(int writeId, int authId) throws AccessDeniedException {
-        if(writeId != authId) throw new AccessDeniedException("Access Denied");
+    private void checkAuthorization(UUID writeId, UUID authId) throws AccessDeniedException {
+        if(!writeId.equals(authId)) throw new AccessDeniedException("Access Denied");
     }
 
     private void validate(User toUpsert) throws InvalidEntityException {

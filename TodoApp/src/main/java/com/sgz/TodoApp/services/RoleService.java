@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class RoleService {
@@ -30,7 +31,7 @@ public class RoleService {
         return allRoles;
     }
 
-    public Role getRoleById(int id) throws InvalidIdException {
+    public Role getRoleById(UUID id) throws InvalidIdException {
         Optional<Role> toGet = roleRepo.findById(id);
 
         if (!toGet.isPresent()) throw new InvalidIdException("Invalid Id");
@@ -66,7 +67,7 @@ public class RoleService {
         return roleRepo.save(toEdit);
     }
 
-    public void deleteRoleById(int id) throws InvalidIdException {
+    public void deleteRoleById(UUID id) throws InvalidIdException {
         checkRoleExists(id);
         roleRepo.deleteById(id);
     }
@@ -83,7 +84,7 @@ public class RoleService {
         if (roleRepo.existsByAuthority(authority)) throw new InvalidAuthorityException("Authority already in use");
     }
 
-    private void checkRoleExists(int id) throws InvalidIdException {
+    private void checkRoleExists(UUID id) throws InvalidIdException {
         if (!roleRepo.existsById(id)) throw new InvalidIdException("Invalid Id");
     }
 }
