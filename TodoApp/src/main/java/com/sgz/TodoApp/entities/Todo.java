@@ -22,6 +22,7 @@ import java.util.UUID;
  *
  * @author samg.zun
  */
+@JsonIgnoreProperties("user")
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
