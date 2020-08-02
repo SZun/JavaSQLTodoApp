@@ -54,6 +54,7 @@ public class AdminController {
     }
 
     @GetMapping("/roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<Role>> getAllRoles() throws NoItemsException {
         return ResponseEntity.ok(roleService.getAllRoles());
     }
