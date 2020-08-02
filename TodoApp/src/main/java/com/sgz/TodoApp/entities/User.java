@@ -1,6 +1,5 @@
 package com.sgz.TodoApp.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@JsonIgnoreProperties("roles")
 @Data
 @Entity
 @Table(name = "users")

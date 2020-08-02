@@ -80,13 +80,15 @@ class AdminControllerTest {
 
     private final Role testRole = new Role(id, "USER");
 
-    private final Role expectedRole = new Role(id, "USER", Arrays.asList(this.testUser));
+    private final Role expectedRole = new Role(id, "USER");
 
     private final User expectedUser = new User(id, "@amBam20", "Sam", Sets.newHashSet(testRole));
 
     @Test
     @WithMockUser(value = "Sam", roles = {"ADMIN"})
     void editUserRoles() throws Exception {
+        final String expected = "{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\",\"roles\":[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}]}";
+
         when(userService.getUserById(any(UUID.class))).thenReturn(expectedUser);
         when(roleService.getRoleById(any(UUID.class))).thenReturn(expectedRole);
         when(adminService.updateUserRoles(any(User.class))).thenReturn(expectedUser);
@@ -99,7 +101,7 @@ class AdminControllerTest {
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\"}", content);
+        assertEquals(expected, content);
     }
 
     @Test

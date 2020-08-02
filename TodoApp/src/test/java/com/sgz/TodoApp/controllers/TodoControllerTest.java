@@ -77,6 +77,8 @@ class TodoControllerTest {
 
     private String testUUIDStr = "11a9c792-45c5-4220-ab7c-fb832b282911";
 
+    final String expected = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false,\"user\":{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"password\":\"@amBam20\",\"username\":\"Sam\",\"roles\":[{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"authority\":\"USER\"}]}}";
+
     private final User testUser = new User(this.id, "@amBam20", "Sam", Sets.newHashSet(new Role(this.id, "USER")));
 
     private final Todo testTodo = new Todo("Walk Dog", LocalDate.of(2020, 07, 31));
@@ -85,8 +87,8 @@ class TodoControllerTest {
 
     @Test
     @WithMockUser
-    void getAll() throws Exception {
-        final String expected = "[{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}]";
+    void getAllTodos() throws Exception {
+        final String expected = "[{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false,\"user\":{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"password\":\"@amBam20\",\"username\":\"Sam\",\"roles\":[{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"authority\":\"USER\"}]}}]";
 
         when(authService.getUserId()).thenReturn(id);
         when(todoService.getAllTodos(any(UUID.class))).thenReturn(Arrays.asList(expectedTodo));
@@ -100,7 +102,7 @@ class TodoControllerTest {
 
     @Test
     @WithMockUser
-    void getAllNoItems() throws Exception {
+    void getAllTodosItems() throws Exception {
         final String expectedMsg = "\"message\":\"No Items\",";
         final String expectedName = "\"name\":\"NoItemsException\",";
         final String expectedErrors = "\"errors\":null,\"timestamp\"";
@@ -119,8 +121,6 @@ class TodoControllerTest {
     @Test
     @WithMockUser
     void getById() throws Exception {
-        final String expected = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
-
         when(authService.getUserId()).thenReturn(id);
         when(todoService.getTodoById(any(UUID.class), any(UUID.class))).thenReturn(expectedTodo);
 
@@ -183,8 +183,6 @@ class TodoControllerTest {
     @Test
     @WithMockUser
     void addTodo() throws Exception {
-        final String expected = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
-
         when(authService.getUserId()).thenReturn(id);
         when(todoService.createTodo(any(Todo.class), any(UUID.class))).thenReturn(expectedTodo);
 
@@ -228,8 +226,6 @@ class TodoControllerTest {
     @Test
     @WithMockUser
     void updateTodo() throws Exception {
-        final String expected = "{\"id\":\"08b2a786-39f8-4752-b4c8-d0c26c01de32\",\"name\":\"Walk Dog\",\"description\":\"Finished walking baxter\",\"startDate\":\"2020-07-31\",\"endDate\":null,\"finished\":false}";
-
         when(authService.getUserId()).thenReturn(id);
         when(todoService.editTodo(any(Todo.class), any(UUID.class))).thenReturn(expectedTodo);
 

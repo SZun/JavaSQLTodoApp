@@ -12,8 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +37,7 @@ class AdminServiceTest {
 
     private final Role testRole = new Role(id, "USER");
 
-    private final Role expectedRole = new Role(id, "USER", Arrays.asList(this.testUser));
+    private final Role expectedRole = new Role(id, "USER");
 
     private final User expectedUser = new User(id, "@amBam20", "Sam", Sets.newHashSet(this.testRole));
 

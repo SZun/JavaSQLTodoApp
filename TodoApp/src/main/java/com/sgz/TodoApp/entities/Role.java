@@ -7,11 +7,8 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-@JsonIgnoreProperties("users")
 @Data
 @Entity
 @Table(name = "roles")
@@ -32,11 +29,4 @@ public class Role {
     @Column(unique = true, nullable = false)
     private String authority;
 
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users = new ArrayList<>();
-
-    public Role(UUID id, String authority) {
-        this.id = id;
-        this.authority = authority;
-    }
 }
