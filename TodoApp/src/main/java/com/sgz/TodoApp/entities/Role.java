@@ -29,7 +29,7 @@ public class Role {
     @NotBlank(message = "Please enter a role")
     @Size(max = 50, message = "Role title cannot be more than 50 characters")
     @NonNull
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String authority;
 
     @ManyToMany(mappedBy = "roles")

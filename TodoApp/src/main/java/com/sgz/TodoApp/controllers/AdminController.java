@@ -70,6 +70,7 @@ public class AdminController {
     public ResponseEntity<Role> createRole(@Valid @RequestBody Role toAdd) throws InvalidEntityException, InvalidAuthorityException {
         return new ResponseEntity(roleService.createRole(toAdd), HttpStatus.CREATED);
     }
+
     @PutMapping("/roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> editRole(@PathVariable UUID id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
