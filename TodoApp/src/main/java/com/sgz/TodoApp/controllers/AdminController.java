@@ -74,6 +74,7 @@ public class AdminController {
     @PutMapping("/roles/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Role> editRole(@PathVariable UUID id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
+        toEdit.setId(id);
         try {
             Role toCheck = roleService.getRoleByAuthority(toEdit.getAuthority());
             if(!toCheck.getId().equals(id)){
