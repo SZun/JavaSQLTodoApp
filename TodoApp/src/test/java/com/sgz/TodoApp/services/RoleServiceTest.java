@@ -37,14 +37,14 @@ class RoleServiceTest {
 
     private final Role testRole = new Role(id, "USER");
 
-    private final Role expectedRole = new Role(id, "USER", Arrays.asList(this.testUser));
+    private final Role expectedRole = new Role(id, "USER");
 
     private final String testLongString = "1ZvBWFVdBu62e6yT87rdELXaLP6KfY2wJ9ZRpw9KmZqzNFICvlNKgkCU28aKRpQb2I85EqAxr6Xb4A1Ct4yNEjTOAXgNyyIBEyTnjOYyN4piLPot1OYtnNftyVXZg6DSxlAGgYzBa5ATYzkSHo2EmIpNyc0NCXvFtPdwP1N30s1Fn63sBaQGdX8sZffYO29yTVtg4LLYRdrrP8aPmL2Pm3c3XySoA7KLLNIi8417yXnjzgdDQErkKiAuoR5REsdL";
 
     @Test
     void getAllRoles() throws NoItemsException {
-        final Role expected2 = new Role(id, "ADMIN", Arrays.asList(testUser));
-        final Role expected3 = new Role(id, "GUEST", Arrays.asList(testUser));
+        final Role expected2 = new Role(id, "ADMIN");
+        final Role expected3 = new Role(id, "GUEST");
 
         when(roleRepo.findAll()).thenReturn(Arrays.asList(expectedRole, expected2, expected3));
 

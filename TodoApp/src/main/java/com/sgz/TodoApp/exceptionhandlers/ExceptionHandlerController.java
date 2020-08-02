@@ -96,7 +96,7 @@ public class ExceptionHandlerController {
             errs.add(new FieldErrorResponse(fe.getField(), fe.getDefaultMessage()));
         });
 
-        CustomError err = new CustomError("Fields are invalid", "InvalidERequestBodyException", errs);
+        CustomError err = new CustomError("Fields are invalid", "InvalidRequestBodyException", errs);
         return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
     }
 

@@ -79,12 +79,14 @@ class UserControllerTest {
 
     private final Role testRole = new Role(this.id, "USER");
 
-    private final Role expectedRole = new Role(this.id, "USER", Arrays.asList(this.testUser));
+    private final Role expectedRole = new Role(this.id, "USER");
 
     private final User expectedUser = new User(this.id, "@amBam20", "Sam", Sets.newHashSet(testRole));
 
     @Test
     void createUser() throws Exception {
+        final String expected = "{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\",\"roles\":[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}]}";
+
         when(roleService.getRoleByAuthority(anyString())).thenReturn(expectedRole);
         when(userService.createUser(any(User.class))).thenReturn(expectedUser);
 
@@ -97,7 +99,7 @@ class UserControllerTest {
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\"}", content);
+        assertEquals(expected, content);
     }
 
     @Test
@@ -171,13 +173,15 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void getAllUsers() throws Exception {
+        final String expected = "[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\",\"roles\":[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}]}]";
+
         when(userService.getAllUsers()).thenReturn(Arrays.asList(expectedUser));
 
         MvcResult mvcResult = mockMvc.perform(get(baseURL))
                 .andExpect(status().isOk()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\"}]", content);
+        assertEquals(expected, content);
     }
 
     @Test
@@ -201,13 +205,15 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void getUserById() throws Exception {
+        final String expected = "{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\",\"roles\":[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}]}";
+
         when(userService.getUserById(any(UUID.class))).thenReturn(expectedUser);
 
         MvcResult mvcResult = mockMvc.perform(get(baseURL + "/" + testUUIDStr))
                 .andExpect(status().isOk()).andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\"}", content);
+        assertEquals(expected, content);
     }
 
     @Test
@@ -231,6 +237,8 @@ class UserControllerTest {
     @Test
     @WithMockUser
     void updateUserById() throws Exception {
+        final String expected = "{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\",\"roles\":[{\"id\":\"00000000-0000-0024-0000-000000000024\",\"authority\":\"USER\"}]}";
+
         when(userService.getUserByName(anyString())).thenReturn(expectedUser);
         when(authService.getUserId()).thenReturn(id);
         when(roleService.getRoleByAuthority(anyString())).thenReturn(expectedRole);
@@ -244,7 +252,7 @@ class UserControllerTest {
                 .andReturn();
 
         String content = mvcResult.getResponse().getContentAsString();
-        assertEquals("{\"id\":\"00000000-0000-0024-0000-000000000024\",\"password\":\"@amBam20\",\"username\":\"Sam\"}", content);
+        assertEquals(expected, content);
     }
 
     @Test

@@ -36,7 +36,7 @@ public class TodoController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<List<Todo>> getAll() throws NoItemsException {
+    public ResponseEntity<List<Todo>> getAllTodos() throws NoItemsException {
         return ResponseEntity.ok(todoService.getAllTodos(authService.getUserId()));
     }
 

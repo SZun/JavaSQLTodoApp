@@ -1,6 +1,5 @@
 package com.sgz.TodoApp.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -12,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@JsonIgnoreProperties("roles")
 @Data
 @Entity
 @Table(name = "users")
@@ -35,7 +33,7 @@ public class User {
 
     @NotBlank(message = "Username can not be blank")
     @Size(max = 50, message = "Username can not be more than 50 characters")
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     @NonNull
     private String username;
 

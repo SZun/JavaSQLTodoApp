@@ -12,8 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,55 +37,11 @@ class AdminServiceTest {
 
     private final Role testRole = new Role(id, "USER");
 
-    private final Role expectedRole = new Role(id, "USER", Arrays.asList(this.testUser));
+    private final Role expectedRole = new Role(id, "USER");
 
     private final User expectedUser = new User(id, "@amBam20", "Sam", Sets.newHashSet(this.testRole));
 
     private final String testLongString = "1ZvBWFVdBu62e6yT87rdELXaLP6KfY2wJ9ZRpw9KmZqzNFICvlNKgkCU28aKRpQb2I85EqAxr6Xb4A1Ct4yNEjTOAXgNyyIBEyTnjOYyN4piLPot1OYtnNftyVXZg6DSxlAGgYzBa5ATYzkSHo2EmIpNyc0NCXvFtPdwP1N30s1Fn63sBaQGdX8sZffYO29yTVtg4LLYRdrrP8aPmL2Pm3c3XySoA7KLLNIi8417yXnjzgdDQErkKiAuoR5REsdL";
-
-    @Test
-    void updateRoleUsers() throws InvalidEntityException {
-        when(roleRepo.save(any(Role.class))).thenReturn(expectedRole);
-
-        Role fromService = toTest.updateRoleUsers(expectedRole);
-
-        assertEquals(expectedRole, fromService);
-    }
-
-    @Test
-    void updateRoleUsersNullRole() {
-        assertThrows(InvalidEntityException.class, () -> toTest.updateRoleUsers(null));
-    }
-
-    @Test
-    void updateRoleUsersBlankAuthority() {
-        final Role toEdit = new Role(id, "  ", Arrays.asList(this.testUser));
-        assertThrows(InvalidEntityException.class, () -> toTest.updateRoleUsers(toEdit));
-    }
-
-    @Test
-    void updateRoleUsersEmptyAuthority() {
-        final Role toEdit = new Role(id, "", Arrays.asList(this.testUser));
-        assertThrows(InvalidEntityException.class, () -> toTest.updateRoleUsers(toEdit));
-    }
-
-    @Test
-    void updateRoleUsersTooLongAuthority() {
-        final Role toEdit = new Role(id, testLongString, Arrays.asList(this.testUser));
-        assertThrows(InvalidEntityException.class, () -> toTest.updateRoleUsers(toEdit));
-    }
-
-    @Test
-    void updateRoleUsersNullUsers() {
-        final Role toEdit = new Role(id, "USER", null);
-        assertThrows(InvalidEntityException.class, () -> toTest.updateRoleUsers(toEdit));
-    }
-
-    @Test
-    void updateRoleUsersEmptyUsers() {
-        final Role toEdit = new Role(id, "USER", new ArrayList<>());
-        assertThrows(InvalidEntityException.class, () -> toTest.updateRoleUsers(toEdit));
-    }
 
     @Test
     void updateUserRoles() throws InvalidEntityException {

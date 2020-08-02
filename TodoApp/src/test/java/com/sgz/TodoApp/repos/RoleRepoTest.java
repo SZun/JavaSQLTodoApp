@@ -27,9 +27,7 @@ class RoleRepoTest {
 
     private final UUID id = new UUID(36,36);
 
-    private final User testUser = new User(this.id, "@amBam20", "Sam");
-
-    private final Role expectedRole = new Role(this.id, "USER", Arrays.asList(this.testUser));
+    private final Role expectedRole = new Role(this.id, "USER");
 
     @Test
     void save(){
@@ -44,7 +42,6 @@ class RoleRepoTest {
         Role expectedParam = captor.getValue();
         assertEquals(id, expectedParam.getId());
         assertEquals("USER", expectedParam.getAuthority());
-        assertEquals(Arrays.asList(this.testUser), expectedParam.getUsers());
 
         assertEquals(expectedRole, fromRepo);
     }
