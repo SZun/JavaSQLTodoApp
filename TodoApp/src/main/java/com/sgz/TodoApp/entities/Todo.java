@@ -7,6 +7,7 @@ package com.sgz.TodoApp.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -31,9 +32,11 @@ import java.util.UUID;
 @Data
 public class Todo {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue(generator = "hibernate-uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @NotBlank(message = "Name can not be blank")
     @Size(max = 50, message = "Name can not be more than 50 characters")
