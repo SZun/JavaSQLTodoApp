@@ -8,6 +8,7 @@ A REST API built to allow you to store and update your daily tasks. This project
 ![](./assets/login.png)
 ![](./assets/get_user.png)
 ![](./assets/jwt.png)
+![](./assets/todo-seed.png)
 ![](./assets/update_roles.png)
 
 ## Getting Started
