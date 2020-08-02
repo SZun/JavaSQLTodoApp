@@ -80,8 +80,10 @@ public class ExceptionHandlerController {
             AccessDeniedException ex,
             WebRequest req) {
 
-        return new ResponseEntity<>(new CustomError(ex.getMessage(), "AccessDenied"),
-                HttpStatus.UNPROCESSABLE_ENTITY);
+        final String CUSTOM_ERR_MESSAGE = "Access to the requested resource was denied";
+
+        return new ResponseEntity<>(new CustomError(CUSTOM_ERR_MESSAGE, "AccessDenied"),
+                HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
