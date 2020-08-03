@@ -43,43 +43,4 @@ public class AdminController {
         return ResponseEntity.ok(adminService.updateUserRoles(toEdit));
     }
 
-    @GetMapping("/roles")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<Role>> getAllRoles() throws NoItemsException {
-        return ResponseEntity.ok(roleService.getAllRoles());
-    }
-
-    @GetMapping("/roles/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> getRoleById(@PathVariable UUID id) throws InvalidIdException {
-        return ResponseEntity.ok(roleService.getRoleById(id));
-    }
-
-    @PostMapping("/roles")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> createRole(@Valid @RequestBody Role toAdd) throws InvalidEntityException, InvalidAuthorityException {
-        return new ResponseEntity(roleService.createRole(toAdd), HttpStatus.CREATED);
-    }
-
-    @PutMapping("/roles/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Role> editRole(@PathVariable UUID id, @Valid @RequestBody Role toEdit) throws InvalidEntityException, InvalidIdException {
-        toEdit.setId(id);
-        try {
-            Role toCheck = roleService.getRoleByAuthority(toEdit.getAuthority());
-            if(!toCheck.getId().equals(id)){
-                return new ResponseEntity(HttpStatus.BAD_REQUEST);
-            }
-        } catch(InvalidAuthorityException | InvalidEntityException ex){}
-
-        return ResponseEntity.ok(roleService.editRole(toEdit));
-    }
-
-    @DeleteMapping("/roles/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<UUID> deleteRoleById(@PathVariable UUID id) throws InvalidIdException {
-        roleService.deleteRoleById(id);
-        return ResponseEntity.ok(id);
-    }
-
 }
